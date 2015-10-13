@@ -1,0 +1,7 @@
+.classpath
+.settings
+.project
+.metadata
+.DS_Store
+*.xcworkspace
+xcuserdata
