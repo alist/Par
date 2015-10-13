@@ -1,0 +1,25 @@
+par (lvalue list)+
+
+lvalue (name)
+
+list ('(' (oritms | anditms | item | list) ')' )
+
+oritms (item ('|' (anditms | item)+)) // or has precedence over hidden and
+anditms (item item+) // two or more items
+
+item (named | quote | regx)
+    named (name cardi?)
+    quote ('^\\"([^\\"]*)\\"')
+    regx  ('\\'(.*)\\'') // regular expression r'whatever'
+
+cardi (any mny opt)
+    any ('*') // 0 to n
+    mny ('+') // 1 to n
+    opt ('?') // 0 or 1
+
+name ('^([A-Za-z_]([A-Za-z0-9_])+)' )
+cmt  ('^[/][/][ ]*(.*?)[\r\n]+|^[ \r\n\t]+')
+
+
+     
+     
