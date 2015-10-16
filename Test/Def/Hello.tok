@@ -1,0 +1,3 @@
+Tok_(def    ,And(One(hello),One(world)))
+Tok_(hello  ,Quo("hello"))
+Tok_(world  ,Quo("world"))

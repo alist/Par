@@ -1,18 +1,18 @@
 
-#import "ParTok.h"
-#import "ParTokStack.h"
+#import "Tok.h"
+#import "TokStack.h"
 #import <unordered_map>
 
 struct ParExpand {
     
-    ParToks *tokens;
-    ParTokStack tokStack;
+    Toks *tokens;
+    TokStack tokStack;
     
     ParExpand() {}
     
-    void expandTokens(ParToks*tokens_);
+    void expandTokens(Toks*tokens_);
     bool thisTokIsSibling(int toki, int level);
-    ParTok *incrementToki(int &toki);
+    Tok *incrementToki(int &toki);
     int expand(int toki);
     //int expandMany (TypeTr3ss *ttss, int toki);
 };

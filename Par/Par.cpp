@@ -1,34 +1,33 @@
-#import "ParDef.h"
-#import "ParTok.h"
+#import "Par.h"
+#import "Tok.h"
 #import <stdarg.h>
 #import <stdio.h>
 
 #define Trace(...)
 #define PrintParseTok(...) //DebugPrint(__VA_ARGS__)
 
-ParToks * ParDef::_tokens=0;
-int ParDef::_tokNow=0;
-int ParDef::_transaction=0;
+Toks * Par::_tokens=0;
+int Par::_transaction=0;
 const char*Unknown = "?";
 
-void ParDef::add(ParDef*n) {
+void Par::add(Par*n) {
     
     n->_level = _level+1;
     _list.push_back(n); 
 }
-void ParDef::init(ParType type_) {
+void Par::init(ParType type_) {
     
     _name = Unknown;
     _parseRegx = 0;
     _parseQuo = 0;
     _type = type_;
     _lastTransaction = _transaction;
-    ParTok::initMapOnce();
+    Tok::initMapOnce();
 }
-void ParDef::setName(const char*name_) {
+void Par::setName(const char*name_) {
     _name = name_;
 }
-ParDef& ParDef::operator =(ParDef&p_)  {
+Par& Par::operator =(Par&p_)  {
     
     //_name       = p_._name; // do not copy name
     _list       = p_._list;
@@ -38,33 +37,33 @@ ParDef& ParDef::operator =(ParDef&p_)  {
     _type       = p_._type;
     return *this;
 }
-ParDef &ParDef::operator [](int index) {
+Par &Par::operator [](int index) {
     
     return *_list[index];
 }
-ParDef::operator float() {
+Par::operator float() {
     
     return (_parseRegx ? (float)(*_parseRegx) : 
             _parseQuo  ? (float)(*_parseQuo)  :  -1);
 }
-ParDef::operator int() {
+Par::operator int() {
     
     return (_parseRegx ? (int)(*_parseRegx) : 
             _parseQuo  ? (int)(*_parseQuo)  :  -1);
 }
-ParDef::operator const char *() {
+Par::operator const char *() {
     
     return (_parseRegx ? (const char*)(*_parseRegx) : 
             _parseQuo  ? (const char*)(*_parseQuo)  : 0);
 }
 
-inline void ParDef::printLevelIndent(int level) {
+inline void Par::printLevelIndent(int level) {
     
     for (int i =0; i<level; i++) {
         PrintParseTok(" ");
     }
 }
-inline void ParDef::printLevelInputMargin(int level, ParDoc&input) {
+inline void Par::printLevelInputMargin(int level, ParDoc&input) {
 
     // print a slice of the input to parse
     PrintParseTok("⦙");
@@ -88,12 +87,12 @@ inline void ParDef::printLevelInputMargin(int level, ParDoc&input) {
     printLevelIndent(level);
 }
 
-int ParDef::pushParTok(int level, ParDoc&input) {
+int Par::pushParTok(int level, ParDoc&input) {
     
     int ret = (int)_tokens->size();
     if (_name.size()>0 && _name[0]!='?') {
         
-        ParTok*token = new  ParTok(_name,0,level);
+        Tok*token = new  Tok(_name,0,level);
         _tokens->push_back(token);
         
         printLevelInputMargin(level,input);
@@ -102,7 +101,7 @@ int ParDef::pushParTok(int level, ParDoc&input) {
     return ret;
 }
 
-void ParDef::pushValue(int level, ParDoc&input) {
+void Par::pushValue(int level, ParDoc&input) {
 
     // ignore discardible regex such as r'^[\\(]' in (r'^[\\(]' (who why*)+ r'^[\\)]')
     if (_name=="?") {
@@ -112,28 +111,28 @@ void ParDef::pushValue(int level, ParDoc&input) {
     printLevelInputMargin(level, input);
     PrintParseTok("%s: %s\n", _name.c_str(),(const char*)*_parseRegx);
     
-    ParTok*token = new ParTok(_name,(const char*)*_parseRegx,level);
+    Tok*token = new Tok(_name,(const char*)*_parseRegx,level);
     _tokens->push_back(token);
 }
 
 #define PushParTok ParDoc prev = input; int tokenSizeBefore = pushParTok(level,input);
 #define PopParTok  input = prev; popParTok(tokenSizeBefore);
 
-void ParDef::popParTok(int tokenSizeBefore) {
+void Par::popParTok(int tokenSizeBefore) {
     
     while (_tokens->size()>tokenSizeBefore) {
         
-        ParTok*token = _tokens->back();
+        Tok*token = _tokens->back();
         delete (token);
         _tokens->pop_back();
     }
 }
-inline int ParDef::parseCount(ParDoc &input, int level) {
+inline int Par::parseCount(ParDoc &input, int level) {
 
     int count = 0;
     for (bool parsing=true; parsing;) {
         
-        for (vector<ParDef*>::iterator it  = _list.begin(); it != _list.end(); it++) {
+        for (vector<Par*>::iterator it  = _list.begin(); it != _list.end(); it++) {
             
             if ((*it)->parse(input,level)) {
                 
@@ -149,7 +148,7 @@ inline int ParDef::parseCount(ParDoc &input, int level) {
     return count;
 }
 
-bool ParDef::parseMny(ParDoc &input, int level) {
+bool Par::parseMny(ParDoc &input, int level) {
     
     Trace(level)
     
@@ -162,7 +161,7 @@ bool ParDef::parseMny(ParDoc &input, int level) {
         return false;
     }
 }
-bool ParDef::parseAny(ParDoc &input, int level) {
+bool Par::parseAny(ParDoc &input, int level) {
     
     PushParTok
     if (parseCount(input, level)>0) {
@@ -173,12 +172,12 @@ bool ParDef::parseAny(ParDoc &input, int level) {
         return true;
     }
 }
-bool ParDef::parseAnd(ParDoc &input, int level) {
+bool Par::parseAnd(ParDoc &input, int level) {
     
     Trace(level)
     
     PushParTok  
-    for (vector<ParDef*>::iterator it = _list.begin(); it != _list.end();  it ++) {
+    for (vector<Par*>::iterator it = _list.begin(); it != _list.end();  it ++) {
         
         if (!(*it)->parse(input,level)) {
             
@@ -188,11 +187,11 @@ bool ParDef::parseAnd(ParDoc &input, int level) {
     }
     return true;
 }           
-bool ParDef::parseOr(ParDoc &input, int level) {
+bool Par::parseOr(ParDoc &input, int level) {
     
     Trace(level)
     
-    for (vector<ParDef*>::iterator it = _list.begin(); it != _list.end(); it++) {
+    for (vector<Par*>::iterator it = _list.begin(); it != _list.end(); it++) {
         
         PushParTok 
         if ((*it)->parse(input,level)) {
@@ -202,11 +201,11 @@ bool ParDef::parseOr(ParDoc &input, int level) {
     }
     return false;
 }        
-bool ParDef::parseOpt(ParDoc &input, int level) {
+bool Par::parseOpt(ParDoc &input, int level) {
     
     Trace(level)
     
-    for (vector<ParDef*>::iterator it  = _list.begin(); it != _list.end(); it++)   {
+    for (vector<Par*>::iterator it  = _list.begin(); it != _list.end(); it++)   {
         
         PushParTok          
         if ((*it)->parse(input,level)) {
@@ -216,7 +215,7 @@ bool ParDef::parseOpt(ParDoc &input, int level) {
     }
     return true;
 } 
-bool ParDef::parseQuo(ParDoc &input, int level)  {
+bool Par::parseQuo(ParDoc &input, int level)  {
     
     if (_parseQuo && _parseQuo->parse(input)) {
         
@@ -229,7 +228,7 @@ bool ParDef::parseQuo(ParDoc &input, int level)  {
         return false;
     }
 } 
-bool ParDef::parseRegx(ParDoc &input, int level) {
+bool Par::parseRegx(ParDoc &input, int level) {
     
     if (_parseRegx && _parseRegx->parse(input)) {
         
@@ -243,7 +242,7 @@ bool ParDef::parseRegx(ParDoc &input, int level) {
     }
 } 
 
-void ParDef::parseBufToFile (const char*buf, const char*traceFile, bool openStderr) {
+void Par::parseBufToFile (const char*buf, const char*traceFile, bool openStderr) {
     
     if (openStderr)
         freopen(traceFile, "w", stderr);    
@@ -269,17 +268,17 @@ void ParDef::parseBufToFile (const char*buf, const char*traceFile, bool openStde
         
         PrintParseTok("\ndone.\n");
     }
-    printParToks();
+    printToks();
 }
 
-void ParDef::parseFileToFile (const char*inputFile, const char*tracefile) {
+void Par::parseFileToFile (const char*inputFile, const char*tracefile) {
     
     char *buf = parseFileToBuf(inputFile);
     parseBufToFile(buf,tracefile,/*openStderr*/true);
     delete buf;
 }
 
-char * ParDef::parseFileToBuf (const char*inputFile) {
+char * Par::parseFileToBuf (const char*inputFile) {
     
     _transaction++;
     
@@ -301,12 +300,12 @@ char * ParDef::parseFileToBuf (const char*inputFile) {
     }
 }
 
-bool ParDef::parse(char*&buf) {
+bool Par::parse(char*&buf) {
     
     ParDoc input(buf);
     return parse(input,0);
 }
-bool ParDef::parse(ParDoc &input, int level) {
+bool Par::parse(ParDoc &input, int level) {
     
     bool ret; 
     
@@ -325,17 +324,17 @@ bool ParDef::parse(ParDoc &input, int level) {
         return true;
     return ret;
 }
-void ParDef::printToFile (const char*logfile) {
+void Par::printToFile (const char*logfile) {
     
     _transaction++;
     
     freopen(logfile, "w", stderr);
-    for (vector<ParDef*>::iterator it = _list.begin(); it != _list.end(); it++) {
+    for (vector<Par*>::iterator it = _list.begin(); it != _list.end(); it++) {
         
         (*it)->print(1);
     }
 }
-void ParDef::print (int level) {
+void Par::print (int level) {
     
     trace(level);     
     
@@ -346,19 +345,19 @@ void ParDef::print (int level) {
         PrintParseTok("*** loop found in definition so stopping here *** ");
         return;
     }
-    for (vector<ParDef*>::iterator it =_list.begin(); it != _list.end(); it++) {
+    for (vector<Par*>::iterator it =_list.begin(); it != _list.end(); it++) {
         
         (*it)->print(level+1);
     }
 }
 
-void ParDef::printParToks() {
+void Par::printToks() {
     
     // show the results of a parse, as list of tokens
     
     PrintParseTok("\n-------------------dump tokens-------------------\n");
 
-    for (ParTok*tok : *_tokens) {
+    for (Tok*tok : *_tokens) {
         
         PrintParseTok("%4i", tok->tokId);
         printLevelIndent(tok->level);
@@ -370,7 +369,7 @@ void ParDef::printParToks() {
             PrintParseTok("%s\n",nodeName);
     }
 }
-bool ParDef::trace(int level,const char *value) {
+bool Par::trace(int level,const char *value) {
     
     // show lex parsing process, in progress, that yields tokens
     

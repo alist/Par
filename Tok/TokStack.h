@@ -1,7 +1,8 @@
-#import "ParTok.h"
+#import "Tok.h"
 #import <unordered_map>
 
 struct ParTokLevel {
+    
     int tokt;
     int level;
     
@@ -11,15 +12,15 @@ struct ParTokLevel {
     }
 };
 
-// see ParTokStack.doc
+// see TokStack.doc
 
-struct ParTokStack {
+struct TokStack {
     
     vector<ParTokLevel*> stack;
-    unordered_map<int, int> mamaTokt; // toki to parnet toki mapping
-    unordered_map<int, int> levelMama; // at current level, who's yo mama
+    unordered_map<int,int> mamaTokt; // toki to parent toki mapping
+    unordered_map<int,int> levelMama; // at current level, who's yo mama
     
-    ParTokStack();
+    TokStack();
     void setStack(int level);
     void setStack(int level, int toki);
     int getTokt();

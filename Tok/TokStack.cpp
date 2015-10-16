@@ -1,12 +1,12 @@
-#import "ParTokStack.h"
+#import "TokStack.h"
 
 
-ParTokStack::ParTokStack() {
+TokStack::TokStack() {
     levelMama[0]=0;
     mamaTokt[0]=0;
 }
 
-void ParTokStack::setStack(int level) {
+void TokStack::setStack(int level) {
     
     ParTokLevel *back = stack.back();
     
@@ -19,7 +19,7 @@ void ParTokStack::setStack(int level) {
         }
     }
 }
-void ParTokStack::setStack(int level, int toki) {
+void TokStack::setStack(int level, int toki) {
     
     int oldLevel         = (stack.size() ? stack.back()->level : 0);
     ParTokLevel *oldBack = (stack.size() ? stack.back() : 0);
@@ -39,7 +39,7 @@ void ParTokStack::setStack(int level, int toki) {
     mamaTokt[toki] = levelMama[level];
 }
 
-int ParTokStack::getTokt() {
+int TokStack::getTokt() {
     if (stack.size()==0) {
         return 0;
     }
@@ -47,7 +47,7 @@ int ParTokStack::getTokt() {
         return stack.back()->tokt;
     }
 }
-int ParTokStack::getLevel() {
+int TokStack::getLevel() {
     if (stack.size()==0) {
         return 0;
     }

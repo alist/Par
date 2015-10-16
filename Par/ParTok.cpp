@@ -1,22 +1,36 @@
-
 #import "ParTok.h"
+#import "Tok.h"
+#import "Par.h"
 
-#define PrintParTok(...) DebugPrint(__VA_ARGS__)
+#import "DebugPrint.h"
+#define PrintDefParse(...) DebugPrint(__VA_ARGS__)
 
-int ParTok::TokIdMax = 0;
-TokType ParTok::TokTypeMax = 1000;
-ParNameEnum ParTok::nameEnum;    // translate token name string into enum type
-ParEnumName ParTok::enumName;    // translate token enum type into name string
+void ParTok::deleteToks() {
 
-void ParTok::initMapOnce() {
-    
+    if (tokens) {
+        
+        for (Tok *token : *tokens) {
+            delete token;
+        }
+        tokens->clear();
+        tokens = 0;
+    }
 }
 
-ParTok::ParTok (string &name, const char*value_, int level_) {
+void ParTok::printToks() {
     
-    tokId = TokIdMax++;
-    tokType = nameEnum[name];
-    value = value_ ?  new string(value_) : new string();
-    level = level_;
-    
+    int row=0;
+    for (Tok* tok : *tokens) {
+        
+        PrintDefParse("%2i,%2i:",row++,tok->level);
+        
+        for (int col = 0; col<tok->level; col++) {
+            PrintDefParse(" ");
+        }
+        
+        TokType type = tok->tokType;
+        const char* name = Tok::enumName[type].c_str();
+        const char* value = tok->value->c_str();
+        PrintDefParse("%s : %s \n", name, value);
+    }
 }

@@ -1,11 +1,11 @@
-par (lvalue list)+
+def (lvalue list)+
 
 lvalue (name)
 
-list ('(' (oritms | anditms | item | list) ')' )
+list ('(' (ors | ands | item | list)+ ')' cardi? )
 
-oritms (item ('|' (anditms | item)+)) // or has precedence over hidden and
-anditms (item item+) // two or more items
+ors (item ('|' (ands | item)+)) // or has precedence over hidden and
+ands (item item+) // two or more items
 
 item (named | quote | regx)
     named (name cardi?)

@@ -1,8 +1,9 @@
 #include <stdio.h>
+#include "ParTest.h"
 
 int main(int argc, const char * argv[]) {
 
-    // insert code here...
-    printf("Hello, World!\n");
+    printf("Hello ParTok\n");
+    ParTest();
     return 0;
 }

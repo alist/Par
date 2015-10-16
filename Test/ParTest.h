@@ -1,1 +1,1 @@
-extern void Tr3Test();
+extern void ParTest();

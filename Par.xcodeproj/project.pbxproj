@@ -8,13 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		8033C9231BCD6370004E43BE /* ParTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8033C9211BCD6370004E43BE /* ParTest.cpp */; settings = {ASSET_TAGS = (); }; };
-		8033C92A1BCD6386004E43BE /* DefParseDef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8033C9271BCD6386004E43BE /* DefParseDef.cpp */; settings = {ASSET_TAGS = (); }; };
-		808E6FC51BCACECB00A16083 /* ParTokStack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 808E6FC31BCACECB00A16083 /* ParTokStack.cpp */; settings = {ASSET_TAGS = (); }; };
 		808E6FD01BCAD06800A16083 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 808E6FCF1BCACF6200A16083 /* main.cpp */; settings = {ASSET_TAGS = (); }; };
 		809A03421BCD9D910021CA94 /* libpcre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 809A033F1BCD9D910021CA94 /* libpcre.a */; settings = {ASSET_TAGS = (); }; };
 		80B3675D1BC3039100DF8F89 /* ParDoc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80B367421BC302DF00DF8F89 /* ParDoc.cpp */; settings = {ASSET_TAGS = (); }; };
-		80B3675F1BC3039100DF8F89 /* ParTok.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80B3674C1BC302DF00DF8F89 /* ParTok.cpp */; settings = {ASSET_TAGS = (); }; };
-		80EC01B41BC966CB00B3D2C8 /* ParDef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80EC01B21BC966CB00B3D2C8 /* ParDef.cpp */; settings = {ASSET_TAGS = (); }; };
+		80C4809B1BD1AB540067ABDA /* ParTokDef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80C480981BD1AB540067ABDA /* ParTokDef.cpp */; settings = {ASSET_TAGS = (); }; };
+		80C480B41BD1AD090067ABDA /* ParTok.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80C480B21BD1AD090067ABDA /* ParTok.cpp */; settings = {ASSET_TAGS = (); }; };
+		80C480BB1BD1AD310067ABDA /* Tok.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80C480B61BD1AD150067ABDA /* Tok.cpp */; settings = {ASSET_TAGS = (); }; };
+		80C480BC1BD1AD3F0067ABDA /* TokStack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80C480B91BD1AD150067ABDA /* TokStack.cpp */; settings = {ASSET_TAGS = (); }; };
+		80C480C61BD1ADF80067ABDA /* ParTokCal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80C480C21BD1ADF80067ABDA /* ParTokCal.cpp */; settings = {ASSET_TAGS = (); }; };
+		80C480C71BD1ADF80067ABDA /* ParTokHello.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80C480C41BD1ADF80067ABDA /* ParTokHello.cpp */; settings = {ASSET_TAGS = (); }; };
+		80EC01B41BC966CB00B3D2C8 /* Par.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80EC01B21BC966CB00B3D2C8 /* Par.cpp */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -30,21 +33,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		8033C91A1BCD6364004E43BE /* Cal.def */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cal.def; sourceTree = "<group>"; };
-		8033C91B1BCD6364004E43BE /* DefParseCal.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DefParseCal.cpp; sourceTree = "<group>"; };
-		8033C91C1BCD6364004E43BE /* DefParseCal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DefParseCal.h; sourceTree = "<group>"; };
-		8033C91E1BCD6364004E43BE /* DefParseHello.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DefParseHello.cpp; sourceTree = "<group>"; };
-		8033C91F1BCD6364004E43BE /* DefParseHello.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DefParseHello.h; sourceTree = "<group>"; };
-		8033C9201BCD6364004E43BE /* Hello.def */ = {isa = PBXFileReference; lastKnownFileType = text; path = Hello.def; sourceTree = "<group>"; };
 		8033C9211BCD6370004E43BE /* ParTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParTest.cpp; sourceTree = "<group>"; };
 		8033C9221BCD6370004E43BE /* ParTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParTest.h; sourceTree = "<group>"; };
-		8033C9251BCD6386004E43BE /* Def.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Def.def; sourceTree = "<group>"; };
-		8033C9261BCD6386004E43BE /* DefEnumDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DefEnumDef.h; sourceTree = "<group>"; };
-		8033C9271BCD6386004E43BE /* DefParseDef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DefParseDef.cpp; sourceTree = "<group>"; };
-		8033C9281BCD6386004E43BE /* DefParseDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DefParseDef.h; sourceTree = "<group>"; };
-		8033C9291BCD6386004E43BE /* DefTokDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DefTokDef.h; sourceTree = "<group>"; };
-		808E6FC31BCACECB00A16083 /* ParTokStack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParTokStack.cpp; sourceTree = "<group>"; };
-		808E6FC41BCACECB00A16083 /* ParTokStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParTokStack.h; sourceTree = "<group>"; };
+		804DAA331BD140E100B9DDD3 /* Scratch.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Scratch.h; sourceTree = "<group>"; };
 		808E6FCF1BCACF6200A16083 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		808E6FD31BCAD0C100A16083 /* DebugPrint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DebugPrint.h; sourceTree = "<group>"; };
 		809A03381BCD9D910021CA94 /* pcre.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pcre.h; sourceTree = "<group>"; };
@@ -59,11 +50,27 @@
 		80B367431BC302DF00DF8F89 /* ParDoc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParDoc.h; sourceTree = "<group>"; };
 		80B3674A1BC302DF00DF8F89 /* ParQuo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParQuo.h; sourceTree = "<group>"; };
 		80B3674B1BC302DF00DF8F89 /* ParRegx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParRegx.h; sourceTree = "<group>"; };
-		80B3674C1BC302DF00DF8F89 /* ParTok.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ParTok.cpp; sourceTree = "<group>"; };
-		80B3674D1BC302DF00DF8F89 /* ParTok.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParTok.h; sourceTree = "<group>"; };
-		80EC01B21BC966CB00B3D2C8 /* ParDef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParDef.cpp; sourceTree = "<group>"; };
-		80EC01B31BC966CB00B3D2C8 /* ParDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParDef.h; sourceTree = "<group>"; };
-		80EC01B51BC96BE800B3D2C8 /* ParNameEnum.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParNameEnum.h; sourceTree = "<group>"; };
+		80C480941BD1AB540067ABDA /* Def.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Def.def; sourceTree = "<group>"; };
+		80C480951BD1AB540067ABDA /* Def.tok */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Def.tok; sourceTree = "<group>"; };
+		80C480981BD1AB540067ABDA /* ParTokDef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParTokDef.cpp; sourceTree = "<group>"; };
+		80C480991BD1AB540067ABDA /* ParTokDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParTokDef.h; sourceTree = "<group>"; };
+		80C480B21BD1AD090067ABDA /* ParTok.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParTok.cpp; sourceTree = "<group>"; };
+		80C480B31BD1AD090067ABDA /* ParTok.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParTok.h; sourceTree = "<group>"; };
+		80C480B61BD1AD150067ABDA /* Tok.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Tok.cpp; sourceTree = "<group>"; };
+		80C480B71BD1AD150067ABDA /* Tok.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tok.h; sourceTree = "<group>"; };
+		80C480B81BD1AD150067ABDA /* TokNameEnum.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TokNameEnum.h; sourceTree = "<group>"; };
+		80C480B91BD1AD150067ABDA /* TokStack.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TokStack.cpp; sourceTree = "<group>"; };
+		80C480BA1BD1AD150067ABDA /* TokStack.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TokStack.h; sourceTree = "<group>"; };
+		80C480BE1BD1ADF80067ABDA /* Cal.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cal.def; sourceTree = "<group>"; };
+		80C480BF1BD1ADF80067ABDA /* Cal.tok */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cal.tok; sourceTree = "<group>"; };
+		80C480C01BD1ADF80067ABDA /* Hello.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Hello.def; sourceTree = "<group>"; };
+		80C480C11BD1ADF80067ABDA /* Hello.tok */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Hello.tok; sourceTree = "<group>"; };
+		80C480C21BD1ADF80067ABDA /* ParTokCal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParTokCal.cpp; sourceTree = "<group>"; };
+		80C480C31BD1ADF80067ABDA /* ParTokCal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParTokCal.h; sourceTree = "<group>"; };
+		80C480C41BD1ADF80067ABDA /* ParTokHello.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParTokHello.cpp; sourceTree = "<group>"; };
+		80C480C51BD1ADF80067ABDA /* ParTokHello.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParTokHello.h; sourceTree = "<group>"; };
+		80EC01B21BC966CB00B3D2C8 /* Par.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Par.cpp; sourceTree = "<group>"; };
+		80EC01B31BC966CB00B3D2C8 /* Par.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Par.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,43 +85,10 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		8033C9191BCD6364004E43BE /* DefCal */ = {
-			isa = PBXGroup;
-			children = (
-				8033C91A1BCD6364004E43BE /* Cal.def */,
-				8033C91B1BCD6364004E43BE /* DefParseCal.cpp */,
-				8033C91C1BCD6364004E43BE /* DefParseCal.h */,
-			);
-			path = DefCal;
-			sourceTree = "<group>";
-		};
-		8033C91D1BCD6364004E43BE /* DefHello */ = {
-			isa = PBXGroup;
-			children = (
-				8033C91E1BCD6364004E43BE /* DefParseHello.cpp */,
-				8033C91F1BCD6364004E43BE /* DefParseHello.h */,
-				8033C9201BCD6364004E43BE /* Hello.def */,
-			);
-			path = DefHello;
-			sourceTree = "<group>";
-		};
-		8033C9241BCD6386004E43BE /* DefDef */ = {
-			isa = PBXGroup;
-			children = (
-				8033C9251BCD6386004E43BE /* Def.def */,
-				8033C9261BCD6386004E43BE /* DefEnumDef.h */,
-				8033C9271BCD6386004E43BE /* DefParseDef.cpp */,
-				8033C9281BCD6386004E43BE /* DefParseDef.h */,
-				8033C9291BCD6386004E43BE /* DefTokDef.h */,
-			);
-			path = DefDef;
-			sourceTree = "<group>";
-		};
 		808E6FCC1BCACF6200A16083 /* Test */ = {
 			isa = PBXGroup;
 			children = (
-				8033C9191BCD6364004E43BE /* DefCal */,
-				8033C91D1BCD6364004E43BE /* DefHello */,
+				80C480BD1BD1ADF80067ABDA /* Def */,
 				808E6FCF1BCACF6200A16083 /* main.cpp */,
 				8033C9211BCD6370004E43BE /* ParTest.cpp */,
 				8033C9221BCD6370004E43BE /* ParTest.h */,
@@ -126,6 +100,7 @@
 			isa = PBXGroup;
 			children = (
 				808E6FD31BCAD0C100A16083 /* DebugPrint.h */,
+				804DAA331BD140E100B9DDD3 /* Scratch.h */,
 			);
 			path = Other;
 			sourceTree = "<group>";
@@ -163,8 +138,9 @@
 		80B366E41BC2FB7300DF8F89 = {
 			isa = PBXGroup;
 			children = (
-				8033C9241BCD6386004E43BE /* DefDef */,
+				80C480931BD1AB540067ABDA /* Def */,
 				80B367401BC302DF00DF8F89 /* Par */,
+				80C480B51BD1AD150067ABDA /* Tok */,
 				809A03361BCD9D910021CA94 /* pcre */,
 				808E6FCC1BCACF6200A16083 /* Test */,
 				808E6FD21BCAD0C100A16083 /* Other */,
@@ -183,19 +159,54 @@
 		80B367401BC302DF00DF8F89 /* Par */ = {
 			isa = PBXGroup;
 			children = (
-				80EC01B21BC966CB00B3D2C8 /* ParDef.cpp */,
-				80EC01B31BC966CB00B3D2C8 /* ParDef.h */,
-				80EC01B51BC96BE800B3D2C8 /* ParNameEnum.h */,
+				80EC01B21BC966CB00B3D2C8 /* Par.cpp */,
+				80EC01B31BC966CB00B3D2C8 /* Par.h */,
 				80B367421BC302DF00DF8F89 /* ParDoc.cpp */,
 				80B367431BC302DF00DF8F89 /* ParDoc.h */,
 				80B3674A1BC302DF00DF8F89 /* ParQuo.h */,
 				80B3674B1BC302DF00DF8F89 /* ParRegx.h */,
-				80B3674C1BC302DF00DF8F89 /* ParTok.cpp */,
-				80B3674D1BC302DF00DF8F89 /* ParTok.h */,
-				808E6FC31BCACECB00A16083 /* ParTokStack.cpp */,
-				808E6FC41BCACECB00A16083 /* ParTokStack.h */,
+				80C480B21BD1AD090067ABDA /* ParTok.cpp */,
+				80C480B31BD1AD090067ABDA /* ParTok.h */,
 			);
 			path = Par;
+			sourceTree = "<group>";
+		};
+		80C480931BD1AB540067ABDA /* Def */ = {
+			isa = PBXGroup;
+			children = (
+				80C480941BD1AB540067ABDA /* Def.def */,
+				80C480951BD1AB540067ABDA /* Def.tok */,
+				80C480981BD1AB540067ABDA /* ParTokDef.cpp */,
+				80C480991BD1AB540067ABDA /* ParTokDef.h */,
+			);
+			path = Def;
+			sourceTree = "<group>";
+		};
+		80C480B51BD1AD150067ABDA /* Tok */ = {
+			isa = PBXGroup;
+			children = (
+				80C480B61BD1AD150067ABDA /* Tok.cpp */,
+				80C480B71BD1AD150067ABDA /* Tok.h */,
+				80C480B81BD1AD150067ABDA /* TokNameEnum.h */,
+				80C480B91BD1AD150067ABDA /* TokStack.cpp */,
+				80C480BA1BD1AD150067ABDA /* TokStack.h */,
+			);
+			path = Tok;
+			sourceTree = "<group>";
+		};
+		80C480BD1BD1ADF80067ABDA /* Def */ = {
+			isa = PBXGroup;
+			children = (
+				80C480BE1BD1ADF80067ABDA /* Cal.def */,
+				80C480BF1BD1ADF80067ABDA /* Cal.tok */,
+				80C480C01BD1ADF80067ABDA /* Hello.def */,
+				80C480C11BD1ADF80067ABDA /* Hello.tok */,
+				80C480C21BD1ADF80067ABDA /* ParTokCal.cpp */,
+				80C480C31BD1ADF80067ABDA /* ParTokCal.h */,
+				80C480C41BD1ADF80067ABDA /* ParTokHello.cpp */,
+				80C480C51BD1ADF80067ABDA /* ParTokHello.h */,
+			);
+			path = Def;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -254,12 +265,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				808E6FC51BCACECB00A16083 /* ParTokStack.cpp in Sources */,
+				80C480C61BD1ADF80067ABDA /* ParTokCal.cpp in Sources */,
 				80B3675D1BC3039100DF8F89 /* ParDoc.cpp in Sources */,
-				80EC01B41BC966CB00B3D2C8 /* ParDef.cpp in Sources */,
+				80C480C71BD1ADF80067ABDA /* ParTokHello.cpp in Sources */,
+				80C480BC1BD1AD3F0067ABDA /* TokStack.cpp in Sources */,
+				80EC01B41BC966CB00B3D2C8 /* Par.cpp in Sources */,
+				80C480B41BD1AD090067ABDA /* ParTok.cpp in Sources */,
+				80C4809B1BD1AB540067ABDA /* ParTokDef.cpp in Sources */,
 				808E6FD01BCAD06800A16083 /* main.cpp in Sources */,
-				8033C92A1BCD6386004E43BE /* DefParseDef.cpp in Sources */,
-				80B3675F1BC3039100DF8F89 /* ParTok.cpp in Sources */,
+				80C480BB1BD1AD310067ABDA /* Tok.cpp in Sources */,
 				8033C9231BCD6370004E43BE /* ParTest.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

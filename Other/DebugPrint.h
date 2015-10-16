@@ -18,7 +18,7 @@
 #endif
 
 #ifdef DEBUG
-#define DebugPrint(...) fprintf(stderr, __VA_ARGS__)
+#define DebugPrint(...) fprintf(stdout, __VA_ARGS__)
 #define Debug(...) __VA_ARGS__
 #else
 #define DebugPrint(...)

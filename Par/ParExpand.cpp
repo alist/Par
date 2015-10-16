@@ -1,11 +1,11 @@
 #import "ParExpand.h"
-#import "ParTok.h"
+#import "Tok.h"
 
 #define PrintParExpand(...) //DebugPrint(__VA_ARGS__)
 
 #pragma mark - expand
 
-void ParExpand::expandTokens(ParToks*tokens_) {
+void ParExpand::expandTokens(Toks*tokens_) {
     
     tokens = tokens_;
     expand(0);
@@ -21,13 +21,13 @@ inline bool ParExpand::thisTokIsSibling(int toki, int level) {
     }
 }
 
-inline ParTok *ParExpand::incrementToki(int &toki) {
+inline Tok *ParExpand::incrementToki(int &toki) {
     
     toki++;
     if (toki>=tokens->size()) {
         return 0;
     }
-    ParTok *tok = (*tokens)[toki];
+    Tok *tok = (*tokens)[toki];
     
 //    if (tok->tokType==kTok_tr3) {
 //        
@@ -42,7 +42,7 @@ inline ParTok *ParExpand::incrementToki(int &toki) {
 int ParExpand::expand(int toki) {
     
     //int size  = tokens->size();
-    ParTok *tok =(*tokens)[toki];
+    Tok *tok =(*tokens)[toki];
     int level = tok->level;
     
     for (; thisTokIsSibling(toki, level);
@@ -73,7 +73,7 @@ int ParExpand::expand(int toki) {
  *
 inline int ParExpand::expandName(TypeTr3ss *ttss, int toki) {
     
-    ParTok*tok = (*tokens)[toki]; //TODO: redundant, optimized away?
+    Tok*tok = (*tokens)[toki]; //TODO: redundant, optimized away?
     TokType tokPrev = ttss->back()->type;
     
     // a:(b) or a(b) - find b
