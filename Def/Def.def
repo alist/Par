@@ -2,22 +2,26 @@ def (lvalue list)+
 
 lvalue (name)
 
-list ('(' (ors | ands | item | list)+ ')' cardi? )
+list ("(" (ors | ands | item | list)+ ")" repeat? )
 
-ors (item ('|' (ands | item)+)) // or has precedence over hidden and
-ands (item item+) // two or more items
+  ors (item ("|" (ands | item))+ ) //explicit '|' has precedence over implicit ' '
 
-item (named | quote | regx)
-    named (name cardi?)
+  ands (item item+) // two or more items
+
+  item (named | quote | regx)
+
+    named (name repeat?)
     quote ('^\\"([^\\"]*)\\"')
-    regx  ('\\'(.*)\\'') // regular expression r'whatever'
+    regx  ('\\'(.*)\\'')
 
-cardi (any mny opt)
-    any ('*') // 0 to n
-    mny ('+') // 1 to n
-    opt ('?') // 0 or 1
+  repeat (any mny opt)
+
+    any ("*") // 0 to n
+    mny ("+") // 1 to n
+    opt ("?") // 0 or 1
 
 name ('^([A-Za-z_]([A-Za-z0-9_])+)' )
+
 cmt  ('^[/][/][ ]*(.*?)[\r\n]+|^[ \r\n\t]+')
 
 

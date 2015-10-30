@@ -1,9 +1,38 @@
 #import "ParTok.h"
 #import "Tok.h"
-#import "Par.h"
+
 
 #import "DebugPrint.h"
-#define PrintDefParse(...) DebugPrint(__VA_ARGS__)
+#define PrintParTok(...) DebugPrint(__VA_ARGS__)
+
+
+void ParTok::initToks(Par *par) {
+    
+    if (par->memoMe<Par::MemoNow) {
+        par->memoMe=Par::MemoNow;
+        
+        int64_t hash = str2int(par->name.c_str());
+        Tok::nameEnum[par->name] = hash;
+        Tok::enumName[hash] = par->name;
+        
+        for (Par*par2 :par->pars) {
+            initToks(par2);
+        }
+    }
+}
+
+
+void ParTok::parseBuf(const char *buf, bool trace, bool print) {
+    
+    Par::MemoNow++;
+    Par::Trace=trace;
+    initToks(root);
+    ParDoc input((char*)buf);
+    root->parse(tokens,input,0);
+    if (print) {
+        printToks();
+    }
+}
 
 void ParTok::deleteToks() {
 
@@ -22,15 +51,15 @@ void ParTok::printToks() {
     int row=0;
     for (Tok* tok : *tokens) {
         
-        PrintDefParse("%2i,%2i:",row++,tok->level);
+        PrintParTok("%2i,%2i:",row++,tok->level);
         
         for (int col = 0; col<tok->level; col++) {
-            PrintDefParse(" ");
+            PrintParTok(" ");
         }
         
         TokType type = tok->tokType;
         const char* name = Tok::enumName[type].c_str();
         const char* value = tok->value->c_str();
-        PrintDefParse("%s : %s \n", name, value);
+        PrintParTok("%s : %s \n", name, value);
     }
 }

@@ -1,3 +1,0 @@
-Tok_(def     ,And(One(hello),One(calendar)))
-Tok_(hello   ,Quo("hello"))
-Tok_(calendar,Quo("cal"))

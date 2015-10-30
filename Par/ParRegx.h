@@ -4,7 +4,7 @@
 #import "ParDoc.h"
 
 /* PCRE is not standard on OS X. So, install local version to this product in ./pcre
- but only works for version 10.6 otherwise need to download and make a new version:
+ To update:
   1) download the zip file from http://pcre.org/ and unzip to a temp directory
   2) within the temp directory, excute: "./configure; make; make install" 
   3) cp /usr/local/include/pcre* pcre/include

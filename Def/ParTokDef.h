@@ -1,23 +1,12 @@
 #import "ParTok.h"
-#import "Par.h"
-
-typedef enum {
-    kDef_undef,
-#define Tok_(a,b) kDef_##a,
-#include "Def.tok"
-#undef Tok_
-    kDef_MaxSize
-} DefEnum_Def;
-
+#import "ParMacro.h"
 
 struct ParTokDef:ParTok {
     
-    void initToks();
-    void parseBuf(const char*buf, bool print);
+    virtual void initToks(Par*);
    
-    // Par *a;
-#define Tok_(a,b) ParDeclare(a,b)
-#include "Def.tok"
-#undef Tok_
+#define Par_(a,b) ParDeclare(a,b) // Par *a;
+#include "Def.par"
+#undef Par_
     
 };

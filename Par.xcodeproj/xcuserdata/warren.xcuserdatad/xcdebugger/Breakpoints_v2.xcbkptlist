@@ -4,19 +4,13 @@
    version = "2.0">
    <Breakpoints>
       <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         BreakpointExtensionID = "Xcode.Breakpoint.ExceptionBreakpoint">
          <BreakpointContent
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Par/ParseLex.cpp"
-            timestampString = "465776284.8285"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "259"
-            endingLineNumber = "259"
-            landmarkName = "ParseLex::parseBufToFile (const char*buf, const char*traceFile, bool openStderr)"
-            landmarkType = "5">
+            scope = "0"
+            stopOnStyle = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -25,14 +19,14 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Par/DefParse.cpp"
-            timestampString = "466267404.380374"
+            filePath = "Test/ParTest.cpp"
+            timestampString = "467913942.263222"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "12"
             endingLineNumber = "12"
-            landmarkName = "ParDef::initTokens()"
-            landmarkType = "5">
+            landmarkName = "ParTest()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -41,13 +35,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "DefDef/Par.cpp"
-            timestampString = "466721112.462445"
+            filePath = "Par/Par.cpp"
+            timestampString = "467855128.675107"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "27"
-            endingLineNumber = "27"
-            landmarkName = "Par::printToks()"
+            startingLineNumber = "283"
+            endingLineNumber = "283"
+            landmarkName = "Par::parseRegx(Toks*toks, ParDoc &amp;input, int level)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

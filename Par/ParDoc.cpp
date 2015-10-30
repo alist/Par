@@ -1,5 +1,4 @@
 #import "ParDoc.h"
-#import "ParDoc.h"
 
 #pragma GCC diagnostic ignored "-Wwrite-strings"  
 

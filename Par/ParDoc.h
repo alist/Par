@@ -1,6 +1,4 @@
-#import "ParDoc.h"
 #import <vector>
-
 
 struct ParDoc {
     

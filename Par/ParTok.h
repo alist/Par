@@ -1,16 +1,20 @@
 #import "TokNameEnum.h"
+#import "Par.h"
 
 struct ParTok {
     
     Toks *tokens;
+    Par *root;
 
-    ParTok(){tokens=0;}
+    ParTok(Par*root_) {tokens = new Toks(); root = root_;}
+    ParTok()          {tokens = new Toks();}
+    
     ~ParTok(){deleteToks();}
     
     void deleteToks();
     void printToks();
     
-    virtual void initToks()=0;
-    virtual void parseBuf(const char*buf, bool print)=0;
+    virtual void initToks(Par*);
+    virtual void parseBuf(const char*buf, bool trace, bool print);
     
 };
