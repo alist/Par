@@ -26,15 +26,14 @@ typedef enum {
 } MatchType;
 
 struct Par;
-typedef vector<Par*> Pars;
+typedef vector<Par*> ParList;
 
 struct Par {
     
     string name;
     RepeatType repeat;
     MatchType matching;
-    
-    Pars pars;
+    ParList parList;
     
     union {
         ParRegx *regx;

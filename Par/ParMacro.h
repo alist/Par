@@ -1,6 +1,6 @@
 #import "Par.h"
 
-/* Create constructors with up to 16 (Par*p) rvalue defined in Par_(...) macros.
+/* Create constructors with up to 10 (Par*p) rvalue defined in Par_(...) macros.
  * Still used for bootstrapping the definition of the parser in Def.par file
  * which takes a .def file and creates a vector of Pars that reference each other.
  * These macros are not used for the .def files.
@@ -24,12 +24,6 @@ x(Par*a,Par*b,Par*c,Par*d,Par*e,Par*f,Par*g) { init(y); add(a); add(b); add(c); 
 x(Par*a,Par*b,Par*c,Par*d,Par*e,Par*f,Par*g,Par*h) { init(y); add(a); add(b); add(c); add(d); add(e); add(f); add(g); add(h); }\
 x(Par*a,Par*b,Par*c,Par*d,Par*e,Par*f,Par*g,Par*h,Par*i) { init(y); add(a); add(b); add(c); add(d); add(e); add(f); add(g); add(h); add(i); }\
 x(Par*a,Par*b,Par*c,Par*d,Par*e,Par*f,Par*g,Par*h,Par*i,Par*j) { init(y); add(a); add(b); add(c); add(d); add(e); add(f); add(g); add(h); add(i); add(j); }\
-x(Par*a,Par*b,Par*c,Par*d,Par*e,Par*f,Par*g,Par*h,Par*i,Par*j,Par*k) { init(y); add(a); add(b); add(c); add(d); add(e); add(f); add(g); add(h); add(i); add(j); add(k); }\
-x(Par*a,Par*b,Par*c,Par*d,Par*e,Par*f,Par*g,Par*h,Par*i,Par*j,Par*k,Par*l) { init(y); add(a); add(b); add(c); add(d); add(e); add(f); add(g); add(h); add(i); add(j); add(k); add(l); }\
-x(Par*a,Par*b,Par*c,Par*d,Par*e,Par*f,Par*g,Par*h,Par*i,Par*j,Par*k,Par*l,Par*m) { init(y); add(a); add(b); add(c); add(d); add(e); add(f); add(g); add(h); add(i); add(j); add(k); add(l); add(m); }\
-x(Par*a,Par*b,Par*c,Par*d,Par*e,Par*f,Par*g,Par*h,Par*i,Par*j,Par*k,Par*l,Par*m,Par*n) { init(y); add(a); add(b); add(c); add(d); add(e); add(f); add(g); add(h); add(i); add(j); add(k); add(l); add(n); }\
-x(Par*a,Par*b,Par*c,Par*d,Par*e,Par*f,Par*g,Par*h,Par*i,Par*j,Par*k,Par*l,Par*m,Par*n,Par*o) { init(y); add(a); add(b); add(c); add(d); add(e); add(f); add(g); add(h); add(i); add(j); add(k); add(l); add(n); add(o); }\
-x(Par*a,Par*b,Par*c,Par*d,Par*e,Par*f,Par*g,Par*h,Par*i,Par*j,Par*k,Par*l,Par*m,Par*n,Par*o,Par*p) { init(y); add(a); add(b); add(c); add(d); add(e); add(f); add(g); add(h); add(i); add(j); add(k); add(l); add(n); add(o); add(p); }\
 
 #define InitRegx(x,y) x(const char*pattern_) { init(new ParRegx(pattern_));} ParamBlock(x,y)
 #define InitQuo(x,y)  x(const char*pattern_) { init(new ParQuo (pattern_));} ParamBlock(x,y)
@@ -61,8 +55,4 @@ struct _Regx : Par { InitRegx(_Regx ,kMatchRegx) };
 #define Opt  new _Opt
 #define Quo  new _Quo
 #define Regx new _Regx
-
-#define ParDeclare(a,b) Par *a;
-#define ParNew(a,b) a = new Par(); a->setName(#a);
-#define ParBind(a,b) { *a=*b; delete(b); }
 

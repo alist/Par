@@ -1,10 +1,10 @@
-def (lvalue list)+
+def (par list)+
 
-lvalue (name)
+par (name)
 
 list ("(" (ors | ands | item | list)+ ")" repeat? )
 
-  ors (item ("|" (ands | item))+ ) //explicit '|' has precedence over implicit ' '
+  ors (item ("|" (ands | item))+ ) // explicit '|' has precedence over implicit ' '
 
   ands (item item+) // two or more items
 

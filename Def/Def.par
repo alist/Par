@@ -1,21 +1,8 @@
-Par_(def    ,Mny(One(lvalue),One(list)))
-Par_(lvalue ,One(name))
-
-Par_(list   ,And(Quo("("),
-                 Mny(Or(One(ors),
-                        One(ands),
-                        One(item),
-                        One(list))),
-                 Quo(")"),
-                 Opt(repeat)))
-
-Par_(ors    ,And(One(item),
-                 Mny(Quo("|"),
-                     Or(One(ands),
-                        One(item)))))
-
-Par_(ands   ,And(One(item),
-                 Mny(item)))
+Par_(def    ,Mny(One(par),One(list)))
+Par_(par    ,One(name))
+Par_(list   ,And(Quo("("),Mny(Or(One(ors),One(ands),One(item),One(list))),Quo(")"),Opt(repeat)))
+Par_(ors    ,And(One(item),Mny(Quo("|"),Or(One(ands),One(item)))))
+Par_(ands   ,And(One(item),Mny(item)))
 Par_(item   ,Or(One(named),One(quote),One(regx)))
 Par_(named  ,And(One(name),Opt(repeat)))
 Par_(quote  ,Regx("^\"([^\"]*)\""))

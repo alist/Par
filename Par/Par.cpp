@@ -12,7 +12,7 @@ bool Par::Trace=false;
 
 void Par::add(Par*n) {
     
-    pars.push_back(n);
+    parList.push_back(n);
 }
 void Par::init() {
 
@@ -54,7 +54,7 @@ Par::Par(Par*par_) {
     name     = par_->name;
     repeat   = par_->repeat;
     matching = par_->matching;
-    pars     = par_->pars;
+    parList     = par_->parList;
 }
 
 
@@ -66,7 +66,7 @@ Par& Par::operator =(Par&p_)  {
     
     //name       = p_.name; // do not copy name
     repeat     = p_.repeat;
-    pars       = p_.pars;
+    parList       = p_.parList;
     matching   = p_.matching;
     match.regx = p_.match.regx;
     match.quo  = p_.match.quo;
@@ -74,7 +74,7 @@ Par& Par::operator =(Par&p_)  {
 }
 Par &Par::operator [](int index) {
     
-    return *pars[index];
+    return *parList[index];
 }
 Par::operator float() {
     
@@ -201,7 +201,7 @@ bool Par::parseMny(Toks*toks, ParDoc &input, int level) {
 }
 bool Par::parseAny(Toks*toks, ParDoc &input, int level) {
 
-    // parse pars
+    // parse parList
     
     for (bool parsing=true; parsing;) {
         
@@ -232,11 +232,11 @@ bool Par::parseOpt(Toks*toks, ParDoc &input, int level) {
 
 bool Par::parseAnd(Toks*toks, ParDoc &input, int level) {
 
-    if (pars.size()==0) {
+    if (parList.size()==0) {
         return false;
     }
     PushTok
-    for (Par *par : pars) {
+    for (Par *par : parList) {
        
         if (!par->parse(toks, input,level)) {
             
@@ -249,11 +249,11 @@ bool Par::parseAnd(Toks*toks, ParDoc &input, int level) {
 
 bool Par::parseOr(Toks*toks, ParDoc &input, int level) {
     
-    if (pars.size()==0) {
+    if (parList.size()==0) {
         return false;
     }
     PushTok
-    for (Par *par : pars) {
+    for (Par *par : parList) {
         
         if (par->parse(toks, input,level)) {
             return true;

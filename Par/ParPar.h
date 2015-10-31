@@ -14,15 +14,15 @@ struct ParPar {
     void initWithFile(const char*filename);
     
     NamePars namePars;
-    Pars parPars;
+    ParList grammar;
     ParTok *parTok;
     
-    int List(Par*par,Toks*toks,int toki);
-    void Lvalue(Toks*toks);
-    void expandRvalue(Par*par);
-    void promoteQuestion(Par *par);
-    void fixupPar(Par*par);
-    void fixup();
+    void addPar(Toks*toks);
+    int addList(Par*par,Toks*toks,int toki);
+    void bindName(Par*par);
+    void promoteOnlyChild(Par *par);
+    void bindParTree(Par*par);
+    void bindGrammar();
     void parseBuf(const char* buf);
     void parseFile(const char* filename);
 };

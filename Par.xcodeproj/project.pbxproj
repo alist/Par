@@ -49,14 +49,14 @@
 		80B367431BC302DF00DF8F89 /* ParDoc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParDoc.h; sourceTree = "<group>"; };
 		80B3674A1BC302DF00DF8F89 /* ParQuo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParQuo.h; sourceTree = "<group>"; };
 		80B3674B1BC302DF00DF8F89 /* ParRegx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParRegx.h; sourceTree = "<group>"; };
-		80C480941BD1AB540067ABDA /* Def.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Def.def; sourceTree = "<group>"; };
-		80C480951BD1AB540067ABDA /* Def.par */ = {isa = PBXFileReference; explicitFileType = text.json; fileEncoding = 4; path = Def.par; sourceTree = "<group>"; };
+		80C480941BD1AB540067ABDA /* Def.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = Def.def; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.python; };
+		80C480951BD1AB540067ABDA /* Def.par */ = {isa = PBXFileReference; explicitFileType = text.json; fileEncoding = 4; lineEnding = 0; path = Def.par; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.javascript; };
 		80C480981BD1AB540067ABDA /* ParTokDef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParTokDef.cpp; sourceTree = "<group>"; };
 		80C480991BD1AB540067ABDA /* ParTokDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParTokDef.h; sourceTree = "<group>"; };
 		80C480B21BD1AD090067ABDA /* ParTok.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParTok.cpp; sourceTree = "<group>"; };
 		80C480B31BD1AD090067ABDA /* ParTok.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParTok.h; sourceTree = "<group>"; };
 		80C480B61BD1AD150067ABDA /* Tok.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Tok.cpp; sourceTree = "<group>"; };
-		80C480B71BD1AD150067ABDA /* Tok.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tok.h; sourceTree = "<group>"; };
+		80C480B71BD1AD150067ABDA /* Tok.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = Tok.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		80C480B81BD1AD150067ABDA /* TokNameEnum.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TokNameEnum.h; sourceTree = "<group>"; };
 		80C480B91BD1AD150067ABDA /* TokStack.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TokStack.cpp; sourceTree = "<group>"; };
 		80C480BA1BD1AD150067ABDA /* TokStack.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TokStack.h; sourceTree = "<group>"; };

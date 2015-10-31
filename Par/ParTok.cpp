@@ -1,21 +1,24 @@
 #import "ParTok.h"
 #import "Tok.h"
 
-
 #import "DebugPrint.h"
 #define PrintParTok(...) DebugPrint(__VA_ARGS__)
 
-
 void ParTok::initToks(Par *par) {
     
-    if (par->memoMe<Par::MemoNow) {
-        par->memoMe=Par::MemoNow;
+    // only pass through one - break cycles
+    if (par->memoMe < Par::MemoNow) {
+        par->memoMe = Par::MemoNow;
         
+        /* each unique name will have only one hash
+         * regardless of which grammar it is coming from
+         * so this ordered_map can be shared globally
+         */
         int64_t hash = str2int(par->name.c_str());
-        Tok::nameEnum[par->name] = hash;
-        Tok::enumName[hash] = par->name;
+        Tok::nameHash[par->name] = hash;
+        Tok::hashName[hash] = par->name;
         
-        for (Par*par2 :par->pars) {
+        for (Par*par2 :par->parList) {
             initToks(par2);
         }
     }
@@ -58,7 +61,7 @@ void ParTok::printToks() {
         }
         
         TokType type = tok->tokType;
-        const char* name = Tok::enumName[type].c_str();
+        const char* name = Tok::hashName[type].c_str();
         const char* value = tok->value->c_str();
         PrintParTok("%s : %s \n", name, value);
     }
