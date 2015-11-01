@@ -1,13 +1,13 @@
 #import "Tok.h"
 #import <unordered_map>
 
-struct ParTokLevel {
+struct TokLevel {
     
     int tokt;
     int level;
     
-    ParTokLevel(int tokt_, int level_) {
-        tokt = tokt_;
+    TokLevel(int toki_, int level_) {
+        tokt = toki_; //TODO: refactor as toki -- is there a conflict?
         level = level_;
     }
 };
@@ -16,9 +16,9 @@ struct ParTokLevel {
 
 struct TokStack {
     
-    vector<ParTokLevel*> stack;
-    unordered_map<int,int> mamaTokt; // toki to parent toki mapping
-    unordered_map<int,int> levelMama; // at current level, who's yo mama
+    vector<TokLevel*> stack;
+    unordered_map<int,int> tokiParent; // toki to parent toki mapping
+    unordered_map<int,int> levelParent; // at current level, who's yo mama
     
     TokStack();
     void setStack(int level);

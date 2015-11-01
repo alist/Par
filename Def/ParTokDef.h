@@ -3,10 +3,10 @@
 
 struct ParTokDef:ParTok {
     
-    virtual void initToks(Par*);
+    virtual void initNameHash(Par*);
    
-#define Par_(a,b) Par *a;
+#define Def_(a,b) Par *a;
 #include "Def.par"
-#undef Par_
+#undef Def_
     
 };

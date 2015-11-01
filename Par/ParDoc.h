@@ -2,27 +2,27 @@
 
 struct ParDoc {
     
-    static std::vector<ParDoc*> _stack;
-    static ParDoc _deepest;
+    static std::vector<ParDoc*> Stack;
+    static ParDoc Deepest;
  
-    char*_char;
-    int _row;
-    int _col;
-    int _size;
+    char*chr;
+    int row;
+    int col;
+    int size;
     
     ParDoc() {
         
-        _char = 0;
-        _row = 0;
-        _col = 0;
-        _size = 0;
+        chr = 0;
+        row = 0;
+        col = 0;
+        size = 0;
     }
 
     ParDoc(char*char_){
         
         ParDoc();
-        _char = char_;
-        _deepest = *this;
+        chr = char_;
+        Deepest = *this;
     }
     
     void operator = (ParDoc&p_);

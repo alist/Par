@@ -1,59 +1,67 @@
-#import "ParPar.h"
+#import "ParDef.h"
 #import "ParTokDef.h"
 
 #import "DebugPrint.h"
-#define PrintParPar(...) DebugPrint(__VA_ARGS__)
+#define PrintParDef(...) DebugPrint(__VA_ARGS__)
 
-void ParPar::initWithFile(const char*filename) {
+void ParDef::initWithFile(const char*filename) {
     
-    const char *buf = Par::readFile(filename);
+    Par::MemoNow++;
+    
+    const char *buf = readFile(filename);
     if (buf) {
         initWithBuf(buf);
         delete (buf);
     }
     else {
-        DebugPrint("*** ParPar::initWithFile(%s) - file not found\n", filename);
+        DebugPrint("*** ParDef::initWithFile(%s) - file not found\n", filename);
     }
 }
-void ParPar::initWithBuf(const char*buf) {
+void ParDef::initWithBuf(const char*buf) {
 
     if (buf) {
         
         parTok = 0;
         ParTokDef *parseDef = new ParTokDef();
-        parseDef->parseBuf(buf,/*trace*/true,/*print*/true);
-        
-        addPar(parseDef->tokens);
+        Toks *toks = parseDef->buf2tok(buf,/*trace*/false,/*print*/false);
+        addPar(toks);
         bindGrammar();
     }
     else {
-        DebugPrint("*** ParPar::initWithBuf - null buffer\n");
+        DebugPrint("*** ParDef::initWithBuf - null buffer\n");
     }
 }
 
-void ParPar::parseFile(const char *filename) {
-    
-    char *buf = Par::readFile(filename);
+Toks *ParDef::parseFile(const char *filename) {
+
+    Par::MemoNow++;
+
+    char *buf = readFile(filename);
     if (buf) {
-        parseBuf(buf);
+        return parseBuf(buf);
     }
     else {
-        DebugPrint("*** ParPar::parseFile(%s) - file not found\n", filename);
+        DebugPrint("*** ParDef::parseFile(%s) - file not found\n", filename);
+        return 0;
     }
 }
-void ParPar::parseBuf(const char *buf) {
+/*
+ */
+Toks *ParDef::parseBuf(const char *buf) {
     
     if (grammar.size()>0) {
         
         parTok = new ParTok(grammar[0]);
-        parTok->parseBuf(buf,/*trace*/true,/*print*/true);
+        Toks *toks = parTok->buf2tok(buf,/*trace*/true,/*print*/true);
+        return toks;
     }
     else {
-        DebugPrint("*** ParPar::parseBuf has no tokens\n");
+        DebugPrint("*** ParDef::parseBuf has no tokens\n");
+        return 0;
     }
 }
 
-void ParPar::addPar(Toks*toks) {
+void ParDef::addPar(Toks*toks) {
     
     Par *par = 0;
     
@@ -88,7 +96,8 @@ void ParPar::addPar(Toks*toks) {
         }
     }
 }
-int ParPar::addList(Par*par,Toks*toks,int toki) {
+
+int ParDef::addList(Par*par,Toks*toks,int toki) {
     
     Tok *tok = (*toks)[toki];
     int level = tok->level;
@@ -174,7 +183,7 @@ int ParPar::addList(Par*par,Toks*toks,int toki) {
 
 /* find named par and get its parList
  */
-inline void ParPar::bindName(Par*par) {
+inline void ParDef::bindName(Par*par) {
     
     string &name = par->name;
     Par *pari = namePars[name];
@@ -193,13 +202,13 @@ inline void ParPar::bindName(Par*par) {
         }
     }
     else if (name!="?"){
-        DebugPrint("*** ParPar::bindName: '%s' not found\n",name.c_str());
+        DebugPrint("*** ParDef::bindName: '%s' not found\n",name.c_str());
      }
 }
 
 /* promote only child
  */
-void ParPar::promoteOnlyChild(Par *par) {
+void ParDef::promoteOnlyChild(Par *par) {
     
     if (par->parList.size()==1) {
         
@@ -215,7 +224,7 @@ void ParPar::promoteOnlyChild(Par *par) {
         }
     }
 }
-void ParPar::bindParTree(Par*par) {
+void ParDef::bindParTree(Par*par) {
     
     if (par->memoMe < Par::MemoNow) {
         par->memoMe = Par::MemoNow;
@@ -232,7 +241,7 @@ void ParPar::bindParTree(Par*par) {
         }
     }
 }
-void ParPar::bindGrammar() {
+void ParDef::bindGrammar() {
     
     for (int i=0; i<grammar.size(); i++) {
         
@@ -245,4 +254,28 @@ void ParPar::bindGrammar() {
         bindParTree(par);
     }
 }
+#pragma mark - file
+
+char * ParDef::readFile(const char*inputFile) {
+    
+    FILE *file = freopen(inputFile, "r", stderr);
+    
+    if (file) {
+        
+        fseek(file, 0, SEEK_END);
+        long fileSize = ftell(file);
+        fseek(file, 0, SEEK_SET);
+        char *buf = (char*)malloc(fileSize+1);
+        fread((void*)buf, fileSize, 1, file);
+        buf[fileSize]='\0';
+        return buf;
+    }
+    else {
+        PrintParDef("\n *** file:%s not found",inputFile);
+        return 0;
+    }
+}
+
+
+
 

@@ -1,21 +1,20 @@
 #import "ParTokDef.h"
 #import "Tok.h"
 
-void ParTokDef::initToks(Par*par) {
+void ParTokDef::initNameHash(Par*par) {
 
-    int64_t num;
-
-#define Par_(a,b)  num = str2int(#a); Tok::hashName[num] = #a; Tok::nameHash[#a] = num;
+    int64_t hash;
+#define Def_(a,b)  hash = str2int(#a); Tok::hashName[hash] = #a; Tok::nameHash[#a] = hash;
 #include "Def.par"
-#undef Par_
+#undef Def_
    
-#define Par_(a,b) a = new Par(); a->setName(#a);
+#define Def_(a,b) a = new Par(); a->setName(#a);
 #include "Def.par" 
-#undef Par_
+#undef Def_
     
-#define Par_(a,b) { *a=*b; delete(b); }
+#define Def_(a,b) { *a=*b; delete(b); }
 #include "Def.par"
-#undef Par_
+#undef Def_
     
     root = def;
 }

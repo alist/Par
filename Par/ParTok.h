@@ -1,4 +1,4 @@
-#import "TokNameEnum.h"
+#import "TokTypes.h"
 #import "Par.h"
 
 struct ParTok {
@@ -14,7 +14,7 @@ struct ParTok {
     void deleteToks();
     void printToks();
     
-    virtual void initToks(Par*);
-    virtual void parseBuf(const char*buf, bool trace, bool print);
+    virtual void initNameHash(Par*);
+    virtual Toks *buf2tok(const char*buf, bool trace, bool print);
     
 };

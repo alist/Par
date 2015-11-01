@@ -7,26 +7,26 @@ using namespace std;
 
 struct ParQuo {
     
-    const char *_pattern;
-    int _size;
-    bool _found;
+    const char *pattern;
+    int size;
+    bool found;
      
     ParQuo(const char*pattern_) {
         
-        _pattern = (char*)pattern_;
-        _size = (int)strlen(_pattern);
-        _found = false;
+        pattern = (char*)pattern_;
+        size = (int)strlen(pattern);
+        found = false;
     }
     ParQuo() {
-        _pattern = 0;
-        _found = false;
+        pattern = 0;
+        found = false;
     }
     ~ParQuo() { }
     virtual bool parse(ParDoc &input_, char *pattern_=0) {
         
-        if (strncmp(input_._char,_pattern,_size)==0) {
+        if (strncmp(input_.chr,pattern,size)==0) {
             
-            input_ += (int)_size;
+            input_ += (int)size;
             input_.eatWhitespace();
             return true;
         }
@@ -34,7 +34,7 @@ struct ParQuo {
     }    
     
     void eval() {}
-    operator int() { return (int)atoi(_pattern); }    
-    operator float() { return (float)atof(_pattern); }    
-    operator const char *() { return _pattern;}
+    operator int() { return (int)atoi(pattern); }    
+    operator float() { return (float)atof(pattern); }    
+    operator const char *() { return pattern;}
 };

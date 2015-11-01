@@ -4,9 +4,15 @@
 #import "DebugPrint.h"
 #define PrintParTok(...) DebugPrint(__VA_ARGS__)
 
-void ParTok::initToks(Par *par) {
+
+/* Initialize name hash, which is used for "case str2int("name"): statements.
+ * starting from root node (usually a "def(...)", parse the graph depth first
+ * and add name and its hash to two unordered_maps.
+ * Memoize to eliminate reprocessing cyclic loops
+ */
+void ParTok::initNameHash(Par *par) {
     
-    // only pass through one - break cycles
+    // only pass through once - break cycles
     if (par->memoMe < Par::MemoNow) {
         par->memoMe = Par::MemoNow;
         
@@ -19,22 +25,25 @@ void ParTok::initToks(Par *par) {
         Tok::hashName[hash] = par->name;
         
         for (Par*par2 :par->parList) {
-            initToks(par2);
+            initNameHash(par2);
         }
     }
 }
 
 
-void ParTok::parseBuf(const char *buf, bool trace, bool print) {
+Toks *ParTok::buf2tok(const char *buf, bool trace, bool print) {
     
     Par::MemoNow++;
     Par::Trace=trace;
-    initToks(root);
+    
+    initNameHash(root);
+    
     ParDoc input((char*)buf);
     root->parse(tokens,input,0);
     if (print) {
         printToks();
     }
+    return tokens;
 }
 
 void ParTok::deleteToks() {

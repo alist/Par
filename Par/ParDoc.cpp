@@ -2,64 +2,64 @@
 
 #pragma GCC diagnostic ignored "-Wwrite-strings"  
 
-std::vector<ParDoc*> ParDoc::_stack;
-ParDoc ParDoc::_deepest;
+std::vector<ParDoc*> ParDoc::Stack;
+ParDoc ParDoc::Deepest;
 
 void ParDoc::operator =(ParDoc&p_) {
     
-    _char  = p_._char;
-    _row   = p_._row;
-    _col   = p_._col;
-    _size  = p_._size;
+    chr   = p_.chr;
+    row   = p_.row;
+    col   = p_.col;
+    size  = p_.size;
     
-    if (_deepest._row < _row ||
-        (_deepest._row == _row && _deepest._col < _col)) {
+    if (Deepest.row < row ||
+        (Deepest.row == row && Deepest.col < col)) {
         
-        _deepest._row = _row;
-        _deepest._col = _col;
-        _deepest._char = _char;
+        Deepest.row = row;
+        Deepest.col = col;
+        Deepest.chr = chr;
     }
     
-    while (_stack.size() > _size) {
+    while (Stack.size() > size) {
         
-        ParDoc*crc = _stack.back();
-        _stack.pop_back();
+        ParDoc*crc = Stack.back();
+        Stack.pop_back();
         delete (crc);
     }
 }
 
-bool ParDoc::operator ==(ParDoc&p_) {
+bool ParDoc::operator == (ParDoc&p_) {
     
-    if (_row == p_._row &&
-        _col == p_._col)
+    if (row == p_.row &&
+        col == p_.col)
         return true;
     else return false;
 }
 void ParDoc::operator +=(int offset) {
     
-    for (int i=0; i<offset; i++, _char++) {
+    for (int i=0; i<offset; i++, chr++) {
         
-        switch (*_char) {
+        switch (*chr) {
                 
             case '\0': return;
-            case '\t': _col = (_col | 0x3)+1; break; // for tabs==4 char
-            case '\n': _col = 0; _row++; break;
+            case '\t': col = (col | 0x3)+1; break; // for tabs==4 chr
+            case '\n': col = 0; row++; break;
             case '\r': break;
-            default: _col++; break;
+            default: col++; break;
         }
     }
 }
 void ParDoc::eatWhitespace() {
     
-    for (;*_char != '\0'; _char++) {
+    for (;*chr != '\0'; chr++) {
         
-        switch (*_char) {
+        switch (*chr) {
                 
             case '\0': return;
-            case '\t': _col = (_col | 0x3)+1; break; // for tabs==4 char
-            case '\n': _col = 0; _row++; break;
+            case '\t': col = (col | 0x3)+1; break; // for tabs==4 chr
+            case '\n': col = 0; row++; break;
             case '\r': break;
-            case  ' ': _col++; break;
+            case  ' ': col++; break;
             default: return;
         }
     }

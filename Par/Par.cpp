@@ -7,7 +7,7 @@
 
 #define PrintParseTok(...) Debug(if (Par::Trace) { DebugPrint(__VA_ARGS__); })
 
-int Par::MemoNow=0;
+int  Par::MemoNow=0;
 bool Par::Trace=false;
 
 void Par::add(Par*n) {
@@ -23,7 +23,6 @@ void Par::init() {
     memoMe = -1;
 }
 void Par::init(RepeatType repeat_) {
-    
     init();
     repeat = repeat_;
 }
@@ -49,12 +48,11 @@ Par::Par(string*name_) {
 }
 
 Par::Par(Par*par_) {
-    
     init();
     name     = par_->name;
     repeat   = par_->repeat;
     matching = par_->matching;
-    parList     = par_->parList;
+    parList  = par_->parList;
 }
 
 
@@ -102,7 +100,7 @@ inline void Par::printLevelInputMargin(int level, ParDoc&input) {
 
     // print a slice of the input to parse
     PrintParseTok("⦙");
-    char *cp =input._char;
+    char *cp =input.chr;
     for (int i=0; i<9; i++) {
         
         if (*cp=='\n' || *cp=='\r') {
@@ -122,6 +120,11 @@ inline void Par::printLevelInputMargin(int level, ParDoc&input) {
     printLevelIndent(level);
 }
 
+#pragma mark - push pop tok 
+
+#define PushTok ParDoc prev = input; int tokenSizeBefore = pushTok(toks,level,input);
+#define PopTok  input = prev; popTok(toks,tokenSizeBefore);
+
 int Par::pushTok(Toks*toks, int level, ParDoc&input) {
     
     int ret = (int)toks->size();
@@ -135,9 +138,6 @@ int Par::pushTok(Toks*toks, int level, ParDoc&input) {
     }
     return ret;
 }
-
-#define PushTok ParDoc prev = input; int tokenSizeBefore = pushTok(toks,level,input);
-#define PopTok  input = prev; popTok(toks,tokenSizeBefore);
 
 void Par::popTok(Toks*toks, int tokenSizeBefore) {
     
@@ -175,8 +175,6 @@ bool Par::parseOne(Toks*toks, ParDoc &input, int level) {
 
 bool Par::parseMny(Toks*toks, ParDoc &input, int level) {
     
-    PushTok
-    
     int count = 0;
     for (bool parsing=true; parsing;) {
         
@@ -191,14 +189,9 @@ bool Par::parseMny(Toks*toks, ParDoc &input, int level) {
             count++;
         }
     }
-    if (count>0) {
-        return true;
-    }
-    else {
-        PopTok
-        return false;
-    }
+    return (count>0);
 }
+
 bool Par::parseAny(Toks*toks, ParDoc &input, int level) {
 
     // parse parList
@@ -299,26 +292,3 @@ bool Par::parseRegx(Toks*toks, ParDoc &input, int level) {
         return false;
     }
 }
-char * Par::readFile(const char*inputFile) {
-    
-    MemoNow++;
-    
-    FILE *file = freopen(inputFile, "r", stderr);
-    
-    if (file) {
-        
-        fseek(file, 0, SEEK_END);
-        long fileSize = ftell(file);
-        fseek(file, 0, SEEK_SET);
-        char *buf = (char*)malloc(fileSize+1);
-        fread((void*)buf, fileSize, 1, file);
-        buf[fileSize]='\0';
-        return buf;
-    }
-    else {
-        PrintParseTok("\n *** file:%s not found",inputFile);
-        return 0;
-    }
-}
-
-

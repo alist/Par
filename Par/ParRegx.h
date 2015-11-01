@@ -84,7 +84,7 @@ struct ParRegx  {
         } else {
             compile (pattern);
         }
-        if (patternOk && match(input_._char)) {
+        if (patternOk && match(input_.chr)) {
             found = true;
         } 
         else {
@@ -97,7 +97,7 @@ struct ParRegx  {
             size = ovector[3] - ovector[2]; // size if submatch inside first parens, when available
             
             if (size>0) {
-                result.assign(input_._char + ovector[2], size);
+                result.assign(input_.chr + ovector[2], size);
                 input_ += ovector[1]; // end of total parse
                 input_.eatWhitespace();
                 size = ovector[1] - ovector[0];
@@ -110,7 +110,7 @@ struct ParRegx  {
 
             size = ovector[1] - ovector[0];
             if (size>0) {
-                result.assign(input_._char + ovector[0], size);
+                result.assign(input_.chr + ovector[0], size);
                 input_ += ovector[1]; // end of total parse
                 input_.eatWhitespace();
                 pcre_free(re);

@@ -1,7 +1,7 @@
 #import "ParQuo.h"
 #import "ParRegx.h"
 #import "ParDoc.h"
-#import "TokNameEnum.h"
+#import "TokTypes.h"
 
 #import <vector>
 #import <iterator>
@@ -42,7 +42,7 @@ struct Par {
     
     static bool Trace; // trace the parse as it happens
     static int MemoNow;
-    int memoMe; //memoize TODO: only for printing?
+    int memoMe; //memoize
  
     Par(){init();};
     
@@ -90,5 +90,4 @@ struct Par {
 
     void parseBufToFile (const char*buf, const char*traceFile, bool openStderr);
     void parseFileToFile (const char*inputFile, const char*tracefile);
-    static char *readFile (const char*inputFile);
   };
