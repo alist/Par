@@ -1,4 +1,22 @@
-/* Bootstrap the grammar parser - see ParMacro for details */
+/* Bootstrap the grammar parser - see ParMacro for details
+ *
+ *  preceeding ' in a Regex quotes, such as:
+ *
+ *       Def_(whatever, Regx("'whatever")) 
+ *
+ * is a cheat that allows for an optional (i'regexstring'),
+ * adds the option PCRE_CASELESS, for example, in Cal.def
+ *
+        first (i'^first')
+ * 
+ * adds PCRE_CASELESS to  pcreOptions
+ *
+ * It looks strange, here in Def.par, to not have a closing ', but it
+ * faster to skip the extra step of the nulling out of the trailing '.
+ *
+ * TODO:get rid of Def.par and use Def.def, instead.
+ */
+
 Def_(def    ,Mny(One(par),One(list)))
 Def_(par    ,One(name))
 Def_(list   ,And(Quo("("),Mny(Or(One(ors),One(ands),One(item),One(list))),Quo(")"),Opt(repeat)))
@@ -6,13 +24,13 @@ Def_(ors    ,And(One(item),Mny(Quo("|"),Or(One(ands),One(item)))))
 Def_(ands   ,And(One(item),Mny(item)))
 Def_(item   ,Or(One(named),One(quote),One(regx)))
 Def_(named  ,And(One(name),Opt(repeat)))
-Def_(quote  ,Regx("^\"([^\"]*)\""))
-Def_(regx   ,Regx("^\'([^\']*)\'"))
+Def_(quote  ,Regx("'^\"([^\"]*)\""))
+Def_(regx   ,Regx("'^([in]?\'[^\']*)\'"))
 Def_(repeat ,Or(One(any),One(mny),One(opt)))
 Def_(any    ,Quo("*"))
 Def_(mny    ,Quo("+"))
 Def_(opt    ,Quo("?"))
-Def_(name   ,Regx("^([A-Za-z_]([A-Za-z0-9_])+)"))
-Def_(cmt    ,Regx("^[/][/][ ]*(.*?)[\r\n]+|^[ \r\n\t]+"))
+Def_(name   ,Regx("'^([A-Za-z_]([A-Za-z0-9_])+)"))
+Def_(cmt    ,Regx("'^[/][/][ ]*(.*?)[\r\n]+|^[ \r\n\t]+"))
 
- 
+

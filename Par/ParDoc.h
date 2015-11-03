@@ -9,9 +9,12 @@ struct ParDoc {
     int row;
     int col;
     int size;
+    int docId;
+    static int nextDocId;
     
     ParDoc() {
         
+        docId = nextDocId++;
         chr = 0;
         row = 0;
         col = 0;

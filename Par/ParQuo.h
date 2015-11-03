@@ -7,27 +7,28 @@ using namespace std;
 
 struct ParQuo {
     
-    const char *pattern;
+    char *pattern;
     int size;
     bool found;
      
     ParQuo(const char*pattern_) {
         
-        pattern = (char*)pattern_;
-        size = (int)strlen(pattern);
+        size = (int)strlen(pattern_);
+        pattern = new char[size + 1];
+        strcpy(pattern, pattern_ );
         found = false;
     }
-    ParQuo() {
-        pattern = 0;
-        found = false;
+    ~ParQuo() {
+        if (pattern) {
+            delete pattern;
+        }
     }
-    ~ParQuo() { }
-    virtual bool parse(ParDoc &input_, char *pattern_=0) {
+    virtual bool parse(ParDoc &input) {
         
-        if (strncmp(input_.chr,pattern,size)==0) {
+        if (strncmp(input.chr,pattern,size)==0) {
             
-            input_ += (int)size;
-            input_.eatWhitespace();
+            input += (int)size;
+            input.eatWhitespace();
             return true;
         }
         return false;

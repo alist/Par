@@ -3,7 +3,6 @@
 #import "DebugPrint.h"
 #define PrintTokStack(...) DebugPrint(__VA_ARGS__)
 
-
 TokStack::TokStack() {
     
     levelParent[0]=0;
@@ -40,24 +39,22 @@ void TokStack::setStack(int level, int toki) {
         delete back;
     }
     if (level > oldLevel) {
-        levelParent[level] = (oldTokLevel ? oldTokLevel->tokt : 0);
+        levelParent[level] = (oldTokLevel ? oldTokLevel->toki : 0);
     }
     TokLevel *newBack = new TokLevel(toki,level);
     stack.push_back(newBack);
     tokiParent[toki] = levelParent[level];
     
-    PrintTokStack("%i: level:%i tokiParent[%i]:%i levelParent[%i]:%i\n",
-                  toki,level,toki,tokiParent[toki],level,levelParent[level]
-                  );
+    //PrintTokStack("%i: level:%i tokiParent[%i]:%i levelParent[%i]:%i\n",toki,level,toki,tokiParent[toki],level,levelParent[level]);
 }
 
-int TokStack::getTokt() {
+int TokStack::getToki() {
     
     if (stack.size()==0) {
         return 0;
     }
     else {
-        return stack.back()->tokt;
+        return stack.back()->toki;
     }
 }
 

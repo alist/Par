@@ -1,9 +1,8 @@
 #import "ParTok.h"
 #import "Tok.h"
-
+#include <assert.h>
 #import "DebugPrint.h"
 #define PrintParTok(...) DebugPrint(__VA_ARGS__)
-
 
 /* Initialize name hash, which is used for "case str2int("name"): statements.
  * starting from root node (usually a "def(...)", parse the graph depth first
@@ -20,10 +19,19 @@ void ParTok::initNameHash(Par *par) {
          * regardless of which grammar it is coming from
          * so this ordered_map can be shared globally
          */
-        int64_t hash = str2int(par->name.c_str());
-        Tok::nameHash[par->name] = hash;
-        Tok::hashName[hash] = par->name;
         
+        int64_t hash = str2int(par->name.c_str());
+
+        if (Tok::hashName.find(hash)==Tok::hashName.end()) {
+            
+            Tok::nameHash[par->name] = hash;
+            Tok::hashName[hash] = par->name;
+        }
+        else {
+            // Failing this assert means a collision was detected
+            // To fix, redesign str2int -- can't fix this during runtime
+            assert(Tok::hashName[hash] == par->name);
+        }
         for (Par*par2 :par->parList) {
             initNameHash(par2);
         }

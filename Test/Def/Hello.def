@@ -1,4 +1,4 @@
-def (hello | world)+
-hello ('^(hello)')
-world ('^(world)')
-yo ('^(yo)')
+def (hello * (world | emoji))+
+nworld ('^(?!world)\w+')
+hello (^'hello')
+world (^'world')

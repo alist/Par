@@ -4,6 +4,7 @@
 
 std::vector<ParDoc*> ParDoc::Stack;
 ParDoc ParDoc::Deepest;
+int ParDoc::nextDocId = 1000;
 
 void ParDoc::operator =(ParDoc&p_) {
     

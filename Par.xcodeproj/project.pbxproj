@@ -34,6 +34,7 @@
 /* Begin PBXFileReference section */
 		8033C9211BCD6370004E43BE /* ParTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = ParTest.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		8033C9221BCD6370004E43BE /* ParTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParTest.h; sourceTree = "<group>"; };
+		804B9CFC1BE7F21C0063250D /* Par.doc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; name = Par.doc; path = Par/Par.doc; sourceTree = "<group>"; };
 		804DAA331BD140E100B9DDD3 /* Scratch.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Scratch.h; sourceTree = "<group>"; };
 		808E6FCF1BCACF6200A16083 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		808E6FD31BCAD0C100A16083 /* DebugPrint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DebugPrint.h; sourceTree = "<group>"; };
@@ -136,6 +137,7 @@
 		80B366E41BC2FB7300DF8F89 = {
 			isa = PBXGroup;
 			children = (
+				804B9CFC1BE7F21C0063250D /* Par.doc */,
 				80C480931BD1AB540067ABDA /* Def */,
 				80B367401BC302DF00DF8F89 /* Par */,
 				80C480B51BD1AD150067ABDA /* Tok */,

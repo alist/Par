@@ -8,7 +8,7 @@ void ParTest() {
     // create the root Tr3* called SkyRoot.
     
     ParDef *parDef = new ParDef();
-    parDef->initWithFile("Cal.def");
-    parDef->parseFile("Cal.test");
+    parDef->initWithFile("Hello.def");
+    parDef->parseFile("Hello.test");
       
 }

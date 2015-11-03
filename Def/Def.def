@@ -12,7 +12,7 @@ list ("(" (ors | ands | item | list)+ ")" repeat? )
 
     named (name repeat?)
     quote ('^\\"([^\\"]*)\\"')
-    regx  ('\\'(.*)\\'')
+    regx  ('^([i]?\\'.*\\')')
 
   repeat (any mny opt)
 

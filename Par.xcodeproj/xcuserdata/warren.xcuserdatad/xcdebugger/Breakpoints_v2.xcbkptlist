@@ -16,32 +16,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Test/ParTest.cpp"
-            timestampString = "467913942.263222"
+            filePath = "Par/ParDoc.cpp"
+            timestampString = "468190639.411907"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "12"
-            endingLineNumber = "12"
-            landmarkName = "ParTest()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Par/Par.cpp"
-            timestampString = "467855128.675107"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "283"
-            endingLineNumber = "283"
-            landmarkName = "Par::parseRegx(Toks*toks, ParDoc &amp;input, int level)"
+            startingLineNumber = "19"
+            endingLineNumber = "19"
+            landmarkName = "ParDoc::operator =(ParDoc&amp;p_)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

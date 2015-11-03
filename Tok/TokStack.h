@@ -3,11 +3,11 @@
 
 struct TokLevel {
     
-    int tokt;
+    int toki;
     int level;
     
     TokLevel(int toki_, int level_) {
-        tokt = toki_; //TODO: refactor as toki -- is there a conflict?
+        toki = toki_; //TODO: refactor as toki -- is there a conflict?
         level = level_;
     }
 };
@@ -23,6 +23,6 @@ struct TokStack {
     TokStack();
     void setStack(int level);
     void setStack(int level, int toki);
-    int getTokt();
+    int getToki();
     int getLevel();
 };

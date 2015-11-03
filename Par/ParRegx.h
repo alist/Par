@@ -17,31 +17,64 @@ using namespace std;
 
 struct ParRegx  {
     
-    bool patternOk;
-    char * pattern;
-
     string result;
     int size;
     bool found;
     
     pcre *re;
-    const char*error;
-    int erroffset;
-    #define OveCount 30 // multiple of three
-    int ovector[OveCount];
     int rc;
+   
+    bool advanceDoc; // advance doc pointer for a match
+
+    /* the next three are only used if advanceDoc==false
+     * to prevent repeating matches on the same doc 
+     * for example: 
+     *
+     *   def (hello)+
+     *   hello (n'hello')
+     */
+     
+    int matchDocId=0;
+
     
-    ParRegx(const char*pattern_) {
-        compile (pattern_);
-        size  = 0;
-        found = false;
-    }
-    ParRegx() {
+#define OveCount 30 // multiple of three
+    int ovector[OveCount];
+    
+    ParRegx(const char*pattern) {
         
-        pattern = 0;
-        patternOk = false;
+        re = 0;
         size  = 0;
         found = false;
+        advanceDoc = true;
+
+        int pcreOptions = 0;
+        
+        for (;*pattern!='\'' && *pattern!= '\0';pattern++) {
+            
+            if (*pattern=='i') {
+                pcreOptions |= PCRE_CASELESS;
+            }
+            else if (*pattern=='n') {
+                advanceDoc = false;
+            }
+        }
+        if (*pattern=='\'') {
+            pattern++;
+        }
+        // compile
+        const char*error=0;
+        int erroffset=0;
+        if (strlen(pattern)>0) {
+            re = pcre_compile (pattern, pcreOptions ,&error, &erroffset,0);
+        }
+        if (error) {
+            fprintf(stdout, "\n*** error: %s",error);
+            fprintf(stdout, "%s\n",pattern);
+            for (int i=0;i<erroffset-1; i++) {
+                fprintf(stdout, " ");
+            }
+            fprintf(stdout, "^");
+        }
     }
     ~ParRegx() {
 
@@ -49,46 +82,27 @@ struct ParRegx  {
             pcre_free(re);
         }
     }
-    
-    bool compile(const char*pattern_) {
+    bool match(char* pattern) {
         
-        if (pattern_) {
-
-            pattern = (char*)pattern_;
-            re = pcre_compile (pattern, 0 ,&error, &erroffset,0);
-            if (re) {
-                
-                patternOk = true;
-                return true;
-            }
-        }
-        patternOk = false;
-        return false;
-    }
-    
-    bool match(char* input) {
-    
         if (re) {
-            rc = pcre_exec(re,0,input,(int)strlen(input),0,0,ovector,OveCount);
+            rc = pcre_exec(re,0,pattern,(int)strlen(pattern),0,0,ovector,OveCount);
             if (rc>0) // matched all subgroups
                 return true;
         }
         return false;
     }
-    virtual bool parse(ParDoc &input_, char *pattern_=0) {
+    virtual bool parse(ParDoc &doc) {
         
-        //??? input_.eatWhitespace();
-        
-        if (pattern_) {
-            compile (pattern_);
-        } else {
-            compile (pattern);
+        if (advanceDoc==false && matchDocId==doc.docId) {
+            // only match once
+            return false;
         }
-        if (patternOk && match(input_.chr)) {
+        if (re && match(doc.chr)) {
+            
+            matchDocId = doc.docId;
             found = true;
         } 
         else {
-            pcre_free(re);
             return false;
         }
 
@@ -97,32 +111,34 @@ struct ParRegx  {
             size = ovector[3] - ovector[2]; // size if submatch inside first parens, when available
             
             if (size>0) {
-                result.assign(input_.chr + ovector[2], size);
-                input_ += ovector[1]; // end of total parse
-                input_.eatWhitespace();
+                result.assign(doc.chr + ovector[2], size);
+                if (advanceDoc) {
+                    doc += ovector[1]; // end of total parse
+                    doc.eatWhitespace();
+                }
                 size = ovector[1] - ovector[0];
-                pcre_free(re);
                 return true;
             }
         }
-        //TODO: is this needed?
-        if (rc>0) {
+        // This is for cases where there is no enclosing parens, such as
+        //  hello ('^he?ll?o')
+        if (rc==1) {
 
             size = ovector[1] - ovector[0];
             if (size>0) {
-                result.assign(input_.chr + ovector[0], size);
-                input_ += ovector[1]; // end of total parse
-                input_.eatWhitespace();
-                pcre_free(re);
+                result.assign(doc.chr + ovector[0], size);
+                if (advanceDoc) {
+                    doc += ovector[1]; // end of total parse
+                    doc.eatWhitespace();
+                }
                 return true;
             }
         }
-        pcre_free(re);
         return false;
     }    
     
     void eval() {}
-    operator int() { return (int)atoi(result.c_str()); }    
+    operator int() { return (int)atoi(result.c_str()); }
     operator float() { return (float)atof(result.c_str()); }    
     operator const char *() { return result.c_str(); }
 };
