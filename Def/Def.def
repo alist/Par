@@ -12,7 +12,7 @@ list ("(" (ors | ands | item | list)+ ")" repeat? )
 
   ands (item item+) // two or more items
 
-  item ((named|quote|regx) pred?)
+  item ((named|quote|regx|meta) pred?)
 
     named (name repeat?)
     quote ('^\\"([^\\"]*)\\"')

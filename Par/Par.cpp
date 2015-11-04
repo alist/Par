@@ -255,6 +255,39 @@ RetFlag Par::parseOpt(Toks*toks, ParDoc &doc, int level) {
 }
 
 #pragma mark - and or
+inline RetFlag Par::parseMeta(Toks *toks, ParDoc&doc, int level, Par *&meta, Par*par) {
+    
+    // skip b in '(a ~b c)'
+    if (par->matching==kMatchMeta) {
+        meta = par;
+        if (meta==parList.back()) {
+            for (int row = doc.row; row==doc.row && *doc.chr;) {
+                meta->parseRegx(toks, doc, level+1);
+            }
+        }
+    }
+    // allow for b in (a ~b c?) or (a ~b c*)
+    else if (meta) {
+        
+        for (int row = doc.row; row==doc.row && *doc.chr;) {
+            
+            if (par->parse(toks, doc,level)==kRetMatch) {
+                return kRetMatch;
+            }
+            else if (meta->parseRegx(toks, doc, level+1)==kRetMatch) {
+                continue;
+            }
+            else {
+                meta = 0;
+                return kRetMatch;
+            }
+        }
+     }
+    else {
+        return par->parse(toks, doc,level);
+    }
+    return kRetMatch;
+}
 
 RetFlag Par::parseAnd(Toks*toks, ParDoc &doc, int level) {
     
@@ -267,42 +300,18 @@ RetFlag Par::parseAnd(Toks*toks, ParDoc &doc, int level) {
     
     for (Par *par : parList) {
         
-        // skip b in '(a ~b c)'
-        if (par->matching==kMatchMeta) {
-            meta = par;
-            if (meta==parList.back()) {
-                for (int row = doc.row; row==doc.row && *doc.chr;) {
-                    meta->parseRegx(toks, doc, level+1);
-                }
-            }
-            else {
-                continue;
-            }
-        }
-        else if (!meta) {
-            RetFlag ret = par->parse(toks, doc,level);
-            if (ret & (kRetNope|kRetEnd)) {
-                PopTok
-                return kRetNope;
-            }
-        }
-        // allow for b in (a ~b c?) or (a ~b c*)
-        else {
-            for (int row = doc.row; row==doc.row && *doc.chr;) {
-                
-                if (par->parse(toks, doc,level)==kRetMatch) {
-                    goto ok;
-                }
-                else if (meta->parseRegx(toks, doc, level+1)==kRetMatch) {
-                    continue;
-                }
-                else {
-                    meta = 0;
-                    break;
-                }
-            }
-        }
-    ok: continue;
+        switch (parseMeta(toks,doc,level,meta,par)) {
+            
+            case kRetNope:
+            case kRetEnd:
+            
+            PopTok
+            return kRetNope;
+
+            case kRetZero:
+            case kRetMatch:
+            break;
+         }
     }
     return kRetMatch;
 }

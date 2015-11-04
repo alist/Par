@@ -88,22 +88,23 @@ struct Par {
     operator const char*();
     
     void printLevelIndent(int level);
-    void printLevelInputMargin(int level, ParDoc&input);
+    void printLevelInputMargin(int level, ParDoc&doc);
     
     int  pushTok  (Toks*, int level, ParDoc&input);
     void popTok   (Toks*, int tokenSizeBefore);
     
-    RetFlag parse    (Toks*, ParDoc &input, int level);
+    RetFlag parse    (Toks*, ParDoc&, int level);
     
-    RetFlag parseOne (Toks*, ParDoc &input, int level);
-    RetFlag parseMny (Toks*, ParDoc &input, int level);
-    RetFlag parseAny (Toks*, ParDoc &input, int level);
-    RetFlag parseOpt (Toks*, ParDoc &input, int level);
+    RetFlag parseOne (Toks*, ParDoc&, int level);
+    RetFlag parseMny (Toks*, ParDoc&, int level);
+    RetFlag parseAny (Toks*, ParDoc&, int level);
+    RetFlag parseOpt (Toks*, ParDoc&, int level);
     
-    RetFlag parseAnd (Toks*, ParDoc &input, int level);
-    RetFlag parseOr  (Toks*, ParDoc &input, int level);
-    RetFlag parseQuo (Toks*, ParDoc &input, int level);
-    RetFlag parseRegx(Toks*, ParDoc &input, int level);
+    RetFlag parseMeta(Toks*, ParDoc&, int level, Par *&meta, Par*par);
+    RetFlag parseAnd (Toks*, ParDoc&, int level);
+    RetFlag parseOr  (Toks*, ParDoc&, int level);
+    RetFlag parseQuo (Toks*, ParDoc&, int level);
+    RetFlag parseRegx(Toks*, ParDoc&, int level);
 
     void parseBufToFile (const char*buf, const char*traceFile, bool openStderr);
     void parseFileToFile (const char*inputFile, const char*tracefile);

@@ -1,3 +1,4 @@
-def (~a hello ~b world? ~c)
+def (~d aloha | ~a hello ~b world? ~c)+
 hello (i'^hello'|i'^(good (morning|afternoon|evening))')
 world (i'^world'|i'^planet'|i'^earth')
+aloha (i'^aloha')
