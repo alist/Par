@@ -1,3 +1,7 @@
+/* this is manually maintained description of Def.par ; it is not compiled
+ * it could be out of sync, if changes were made to Def.par, and not here
+ * see Def.par for more details
+ */
 def (par list)+
 
 par (name)
@@ -8,11 +12,13 @@ list ("(" (ors | ands | item | list)+ ")" repeat? )
 
   ands (item item+) // two or more items
 
-  item (named | quote | regx)
+  item ((named|quote|regx) pred?)
 
     named (name repeat?)
     quote ('^\\"([^\\"]*)\\"')
-    regx  ('^([i]?\\'.*\\')')
+    regx  ('^([i]?\\'.*\\')' pred?)
+    pred  ('=>\'(\w+)\')
+    meta  ('^[\~]([a-z]+)')
 
   repeat (any mny opt)
 

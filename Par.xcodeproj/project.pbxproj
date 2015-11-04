@@ -50,7 +50,7 @@
 		80B367431BC302DF00DF8F89 /* ParDoc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParDoc.h; sourceTree = "<group>"; };
 		80B3674A1BC302DF00DF8F89 /* ParQuo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParQuo.h; sourceTree = "<group>"; };
 		80B3674B1BC302DF00DF8F89 /* ParRegx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParRegx.h; sourceTree = "<group>"; };
-		80C480941BD1AB540067ABDA /* Def.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = Def.def; sourceTree = "<group>"; };
+		80C480941BD1AB540067ABDA /* Def.def */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; lineEnding = 0; path = Def.def; sourceTree = "<group>"; };
 		80C480951BD1AB540067ABDA /* Def.par */ = {isa = PBXFileReference; explicitFileType = text.json; fileEncoding = 4; lineEnding = 0; path = Def.par; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.javascript; };
 		80C480981BD1AB540067ABDA /* ParTokDef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParTokDef.cpp; sourceTree = "<group>"; };
 		80C480991BD1AB540067ABDA /* ParTokDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParTokDef.h; sourceTree = "<group>"; };
@@ -61,7 +61,7 @@
 		80C480B81BD1AD150067ABDA /* TokTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TokTypes.h; sourceTree = "<group>"; };
 		80C480B91BD1AD150067ABDA /* TokStack.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TokStack.cpp; sourceTree = "<group>"; };
 		80C480BA1BD1AD150067ABDA /* TokStack.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TokStack.h; sourceTree = "<group>"; };
-		80C480BE1BD1ADF80067ABDA /* Cal.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cal.def; sourceTree = "<group>"; };
+		80C480BE1BD1ADF80067ABDA /* Cal.def */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = Cal.def; sourceTree = "<group>"; };
 		80C480C01BD1ADF80067ABDA /* Hello.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Hello.def; sourceTree = "<group>"; };
 		80C480C11BD1ADF80067ABDA /* Hello.test */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Hello.test; sourceTree = "<group>"; };
 		80C480CA1BD4023E0067ABDA /* ParMacro.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParMacro.h; sourceTree = "<group>"; };

@@ -17,7 +17,8 @@ using namespace std;
 
 struct ParRegx  {
     
-    string result;
+    string result;  // result of match
+    string result2; // alternate return value (^'one'=>'1')
     int size;
     bool found;
     
@@ -35,7 +36,6 @@ struct ParRegx  {
      */
      
     int matchDocId=0;
-
     
 #define OveCount 30 // multiple of three
     int ovector[OveCount];
@@ -93,8 +93,8 @@ struct ParRegx  {
     }
     virtual bool parse(ParDoc &doc) {
         
+        // only match once (n'meet')
         if (advanceDoc==false && matchDocId==doc.docId) {
-            // only match once
             return false;
         }
         if (re && match(doc.chr)) {
@@ -106,12 +106,22 @@ struct ParRegx  {
             return false;
         }
 
+        // submatch inside first parens ('(m(ee)?t)')
+        
         if (rc>1) {
             
-            size = ovector[3] - ovector[2]; // size if submatch inside first parens, when available
+            size = ovector[3] - ovector[2];
             
             if (size>0) {
-                result.assign(doc.chr + ovector[2], size);
+                
+                // ('(m(ee)?t)'=>'meet') // "mt" => "meet"
+                if (result2.size()) {
+                    result = result2;
+                }
+                // ('(m(ee)?t)') // "mt" => "mt"
+                else {
+                     result.assign(doc.chr + ovector[2], size);
+                }
                 if (advanceDoc) {
                     doc += ovector[1]; // end of total parse
                     doc.eatWhitespace();
@@ -120,13 +130,22 @@ struct ParRegx  {
                 return true;
             }
         }
-        // This is for cases where there is no enclosing parens, such as
-        //  hello ('^he?ll?o')
+    
+        // no enclosing parens  ('one')
+    
         if (rc==1) {
 
             size = ovector[1] - ovector[0];
             if (size>0) {
-                result.assign(doc.chr + ovector[0], size);
+                
+                // ('one'=>'1') // "one" => "1"
+                if (result2.size()) {
+                    result = result2;
+                }
+                 // ('one') // "one" => "one"
+                else {
+                    result.assign(doc.chr + ovector[0], size);
+                }
                 if (advanceDoc) {
                     doc += ovector[1]; // end of total parse
                     doc.eatWhitespace();

@@ -46,8 +46,8 @@ Toks *ParTok::buf2tok(const char *buf, bool trace, bool print) {
     
     initNameHash(root);
     
-    ParDoc input((char*)buf);
-    root->parse(tokens,input,0);
+    ParDoc doc((char*)buf);
+    root->parse(tokens,doc,0);
     if (print) {
         printToks();
     }

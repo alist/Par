@@ -3,7 +3,7 @@
 struct ParDoc {
     
     static std::vector<ParDoc*> Stack;
-    static ParDoc Deepest;
+    //static ParDoc Deepest;
  
     char*chr;
     int row;
@@ -23,9 +23,12 @@ struct ParDoc {
 
     ParDoc(char*char_){
         
-        ParDoc();
+        docId = nextDocId++;
         chr = char_;
-        Deepest = *this;
+        row = 0;
+        col = 0;
+        size = (int)strlen(chr);
+        //Deepest = *this;
     }
     
     void operator = (ParDoc&p_);

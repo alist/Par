@@ -1,20 +1,19 @@
-def (meeting | reminder)+
-meeting (meet rarrow date+)
+def (meeting|reminder)+
+meeting (meet date+)
 meet (i'^(m(ee)?t)')
-rarrow ("→")
-date (dow | time)
+date (dow|time)
 
-dow (tmrw | mon | tue | wed | thu | fri | sat | sun)
-tmrw(i'^(to?mo?r?r?o?w)')
-mon (i'^(mond?a?y?)')
-tue (i'^(tues?d?a?y?)')
-wed (i'^(wedn?e?s?d?a?y?)')
-thu (i'^(thur?s?d?a?y?)')
-fri (i'^(frid?a?y?)')
-sat (i'^(satu?r?d?a?y)')
-sun (i'^(sund?a?y?)')
+dow (i'^(ye?s?te?r?da?y?)'  =>'-1' |
+     i'^(to?mo?r?r?o?w)'    =>'+1' |
+     i'^(mond?a?y?)'        => '1' |
+     i'^(tues?d?a?y?)'      => '2' |
+     i'^(wedn?e?s?d?a?y?)'  => '3' |
+     i'^(thur?s?d?a?y?)'    => '4' |
+     i'^(frid?a?y?)'        => '5' |
+     i'^(satu?r?d?a?y)'     => '6' |
+     i'^(sund?a?y?)'        => '7' )
 
-reminder (rmdr etc? )
+der (rmdr etc? )
 
 rmdr  (i'^re?mi?nde?r')
 and   (i'^and')
@@ -26,34 +25,24 @@ word ('^([A-Za-z0-9\.]+)')
 name ('^([A-Za-z]+)')
 hon (i'^((dr|mr|mrs|ms|mssr)[\.]?)')
 
-date (dow | time)
 time (hour min? (am|pm)? )
-dow (tmrw | mon | tue | wed | thu | fri | sat | sun)
-
-mon (i'^(mond?a?y?)')
-tue (i'^(tues?d?a?y?)')
-wed (i'^(wedn?e?s?d?a?y?)')
-thu (i'^(thur?s?d?a?y?)')
-fri (i'^(frid?a?y?)')
-sat (i'^(satu?r?d?a?y)')
-sun (i'^(sund?a?y?)')
 
 year ('^((19|20)[0-9][0-9])')
 yr   (i'^(y(ea)?r)')
 
-mnth (jan | feb | mar | apr | may | jun | jul | aug | sep | oct | nov | dec)
-jan (i'^(janu?a?r?y?)')
-feb (i'^(febr?u?a?r?y?)')
-mar (i'^(marc?h?)')
-apr (i'^(apri?l?)')
-may (i'^(may)')
-jun (i'^(june?)')
-jul (i'^(july?)')
-aug (i'^(augu?s?t?)')
-sep (i'^(sept?e?m?b?e?r?)')
-oct (i'^(octo?b?e?r?)')
-nov (i'^(nove?m?b?e?r?)')
-dec (i'^(dece?m?b?e?r?)')
+month (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)
+jan (i'^janu?a?r?y?'    =>'01')
+feb (i'^febr?u?a?r?y?'  =>'02')
+mar (i'^marc?h?'        =>'03')
+apr (i'^apri?l?'        =>'04')
+may (i'^may'            =>'05')
+jun (i'^june?'          =>'06')
+jul (i'^july?'          =>'07')
+aug (i'^augu?s?t?'      =>'08')
+sep (i'^sept?e?m?b?e?r?'=>'09')
+oct (i'^octo?b?e?r?'    =>'10')
+nov (i'^nove?m?b?e?r?'  =>'11')
+dec (i'^dece?m?b?e?r?'  =>'12')
 
 mdy (i'^(([0]?[0-9]|1[01])[/-]([012][0-9]|3[01])[/-](20)?[0-9][0-9])')
 
@@ -62,7 +51,6 @@ min  (i'^[:\.]([0-5][0-9])')
 am   (i'^(am?)')
 pm   (i'^(pm?)')
 
-tmrw (i'^(to?mo?r?r?o?w)')
 next (i'^(ne?xt?)')
 
 day  (i'^(da?y)')
@@ -73,47 +61,45 @@ evry (i'^(eve?ry)')
 wkdy (i'^(w(ee)?kda?y)')
 wknd (i'^(w(ee)?ke?nd)')
 
-rmnd (i'^(re?mi?n?de?r?)')
+rmnd (i'^re?mi?n?de?r?')
 meet (i'^(m(ee)?t)')
-etc  (i'^(a|the|me|a|is|us|on)')
-for  (i'^(for)')
+etc  (i'^a|the|me|a|is|us|on')
+for  (i'^for')
 
-brkfst(i'^(br(ea)?kfa?st)')
-lnch  (i'^(lu?nch)')
-brnch (i'^(bru?nch)')
-cof   (i'^(coff?e?e?)')
-dnr   (i'^(di?nn?e?r)')
+bfast  (i'^(br(ea)?kfa?st)')
+lunch  (i'^(lu?nch)')
+brunch (i'^(bru?nch)')
+coffee (i'^(coff?e?e?)')
+dinner (i'^(di?nn?e?r)')
 
 dur (for num (days|hours|mins) (and (hours|mins))?)
 
-num (digits23 | numword+ )
+num (digits23|wordNum+ )
 digits  ('^([\.]?[0-9][\.]?[0-9]?[0-9]?)')
 digits23('^([0-9]{2,3})')
 
-numword (one | two | three| four | five | six | seven | eight | nine | ten | eleven | twelve | fifteen | twenty | thirty | forty | fifty | sixty)
-one     (i'^one')
-two     (i'^two')
-three   (i'^three')
-four    (i'^four')
-five    (i'^five')
-six     (i'^six')
-seven   (i'^seven')
-eight   (i'^eight')
-nine    (i'^nine')
-ten     (i'^ten')
-eleven  (i'^eleven')
-twelve  (i'^twelve')
-fifteen (i'^fifteen')
-twenty  (i'^twenty')
-thirty  (i'^thirty')
-forty   (i'^forty')
-fifty   (i'^fifty')
-sixty   (i'^sixty')
+wordNum (i'^one'     => '1' |
+         i'^two'     => '2' |
+         i'^three'   => '3' |
+         i'^four'    => '4' |
+         i'^five'    => '5' |
+         i'^six'     => '6' |
+         i'^seven'   => '7' |
+         i'^eight'   => '8' |
+         i'^nine'    => '9' |
+         i'^ten'     =>'10' |
+         i'^eleven'  =>'11' |
+         i'^twelve'  =>'12' |
+         i'^fifteen' =>'15' |
+         i'^twenty'  =>'20' |
+         i'^thirty'  =>'30' |
+         i'^forty'   =>'40' |
+         i'^fifty'   =>'50' |
+         i'^sixty'   =>'60' )
 
-numfrac (half | quarter | tenths)
-half    (i'^half')
-quarter (i'^quarter')
-tenths  (i'^tenths')
+wordfrac (i'^half'    =>'.50' |
+          i'^quarter' =>'.25' |
+          i'^tenths'  =>'.10' )
 
 months  (i'^(months?)')
 weeks   (i'^(weeks?)')
@@ -121,18 +107,14 @@ days    (i'^(da?ys?)')
 hours   (i'^(h(ou)?rs?)')
 mins    (i'^(minu?t?e?s?)')
 
-position (first | second | third | fourth | last)
-first   (i'^first')
-second  (i'^second')
-third   (i'^third')
-fourth  (i'^fourth')
-last    (i'^last')
+weekpos (
+i'^first'  => '1' |
+i'^second' => '2' |
+i'^third'  => '3' |
+i'^fourth' => '4' |
+i'^next'   =>'+1' |
+i'^last'   =>'-1' )
 
 interval (every)
 ending   (until)
-
-
-
-
-
 

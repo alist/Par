@@ -23,7 +23,7 @@ void ParDef::initWithBuf(const char*buf) {
         
         parTok = 0;
         ParTokDef *parseDef = new ParTokDef();
-        Toks *toks = parseDef->buf2tok(buf,/*trace*/false,/*print*/false);
+        Toks *toks = parseDef->buf2tok(buf,/*trace*/true,/*print*/true);
         addPar(toks);
         bindGrammar();
     }
@@ -129,7 +129,7 @@ int ParDef::addList(Par*par,Toks*toks,int toki) {
                 par->parList.push_back(pari);
                 toki = addList(pari, toks, toki);
                 break;
-            }
+            } 
                 
             case str2int("name"): {
                 
@@ -153,6 +153,24 @@ int ParDef::addList(Par*par,Toks*toks,int toki) {
                 string *value = tok->value;
                 ParRegx *rx = new ParRegx(value->c_str());
                 Par*pari = new Par(rx);
+                par->parList.push_back(pari);
+                break;
+            }
+            case str2int("pred"): {
+                
+                Par*pari = par->parList.back();
+                if (pari->matching==kMatchRegx) {
+                    ParRegx *rx = pari->match.regx;
+                    rx->result2 = *tok->value;
+                }
+                break;
+            }
+            case str2int("meta"): {
+                
+                ParRegx *rx = new ParRegx("'^\\w+");
+                Par*pari = new Par(rx);
+                pari->name = *tok->value;
+                pari->matching = kMatchMeta;
                 par->parList.push_back(pari);
                 break;
             }
@@ -201,7 +219,8 @@ inline void ParDef::bindName(Par*par) {
             }
         }
     }
-    else if (name!="?"){
+    else if (name!="?" &&
+             par->matching!=kMatchMeta){
         DebugPrint("*** ParDef::bindName: '%s' not found\n",name.c_str());
      }
 }

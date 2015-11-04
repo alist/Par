@@ -3,7 +3,7 @@
 #pragma GCC diagnostic ignored "-Wwrite-strings"  
 
 std::vector<ParDoc*> ParDoc::Stack;
-ParDoc ParDoc::Deepest;
+//ParDoc ParDoc::Deepest;
 int ParDoc::nextDocId = 1000;
 
 void ParDoc::operator =(ParDoc&p_) {
@@ -13,13 +13,13 @@ void ParDoc::operator =(ParDoc&p_) {
     col   = p_.col;
     size  = p_.size;
     
-    if (Deepest.row < row ||
-        (Deepest.row == row && Deepest.col < col)) {
-        
-        Deepest.row = row;
-        Deepest.col = col;
-        Deepest.chr = chr;
-    }
+//    if (Deepest.row < row ||
+//        (Deepest.row == row && Deepest.col < col)) {
+//        
+//        Deepest.row = row;
+//        Deepest.col = col;
+//        Deepest.chr = chr;
+//    }
     
     while (Stack.size() > size) {
         

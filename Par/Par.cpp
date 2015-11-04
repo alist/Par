@@ -9,6 +9,8 @@
 
 int  Par::MemoNow=0;
 bool Par::Trace=false;
+int Par::MaxCountDefault = 99; // max matches for a* or a+
+int Par::MaxLevelDefault =200; // max levels deep into parse tree
 
 void Par::add(Par*n) {
     
@@ -55,7 +57,6 @@ Par::Par(Par*par_) {
     parList  = par_->parList;
 }
 
-
 void Par::setName(const char*name_) {
     name = name_;
 }
@@ -96,11 +97,11 @@ inline void Par::printLevelIndent(int level) {
         PrintParseTok(" ");
     }
 }
-inline void Par::printLevelInputMargin(int level, ParDoc&input) {
+inline void Par::printLevelInputMargin(int level, ParDoc&doc) {
 
-    // print a slice of the input to parse
+    // print a slice of the doc to parse
     PrintParseTok("⦙");
-    char *cp =input.chr;
+    char *cp =doc.chr;
     for (int i=0; i<9; i++) {
         
         if (*cp=='\n' || *cp=='\r') {
@@ -122,10 +123,10 @@ inline void Par::printLevelInputMargin(int level, ParDoc&input) {
 
 #pragma mark - push pop tok 
 
-#define PushTok ParDoc prev = input; int tokenSizeBefore = pushTok(toks,level,input);
-#define PopTok  input = prev; popTok(toks,tokenSizeBefore);
+#define PushTok ParDoc prev = doc; int tokenSizeBefore = pushTok(toks,level,doc);
+#define PopTok  doc = prev; popTok(toks,tokenSizeBefore);
 
-int Par::pushTok(Toks*toks, int level, ParDoc&input) {
+int Par::pushTok(Toks*toks, int level, ParDoc&doc) {
     
     int ret = (int)toks->size();
     if (name.size()>0 && name[0]!='?') {
@@ -133,7 +134,7 @@ int Par::pushTok(Toks*toks, int level, ParDoc&input) {
         Tok*token = new  Tok(name,0,level);
         toks->push_back(token);
         
-        printLevelInputMargin(level,input);
+        printLevelInputMargin(level,doc);
         PrintParseTok("%s\n",name.c_str());
     }
     return ret;
@@ -150,145 +151,214 @@ void Par::popTok(Toks*toks, int tokenSizeBefore) {
 }
 
 
-bool Par::parse(Toks*toks, ParDoc &input, int level) {
+RetFlag Par::parse(Toks*toks, ParDoc &doc, int level) {
     
-    switch (repeat) { //TODO: One(item) is workaround to line up levels
+    if (level>MaxLevelDefault) {
+        PrintParseTok("\n*** %s:parse exceeded maximum levels:%i***\n",name.c_str(),MaxLevelDefault);
+        exit(-1);
+    }
+    switch (repeat) {
 
         default:
-        case kRepOne: return parseOne(toks,input,level+1);
-        case kRepMny: return parseMny(toks,input,level+1);
-        case kRepAny: return parseAny(toks,input,level+1);
-        case kRepOpt: return parseOpt(toks,input,level+1);
+        case kRepOne: return parseOne(toks,doc,level+1);
+        case kRepMny: return parseMny(toks,doc,level+1);
+        case kRepAny: return parseAny(toks,doc,level+1);
+        case kRepOpt: return parseOpt(toks,doc,level+1);
     }
 }
 
-bool Par::parseOne(Toks*toks, ParDoc &input, int level) {
+RetFlag Par::parseOne(Toks*toks, ParDoc &doc, int level) {
     
     switch (matching) {
             
-        case kMatchRegx:return parseRegx(toks,input,level);
-        case kMatchQuo: return parseQuo (toks,input,level);
-        case kMatchAnd: return parseAnd (toks,input,level);
-        case kMatchOr:  return parseOr  (toks,input,level);
+        case kMatchMeta:
+        case kMatchRegx: return parseRegx(toks,doc,level);
+            
+        case kMatchQuo:  return parseQuo (toks,doc,level);
+        case kMatchAnd:  return parseAnd (toks,doc,level);
+        case kMatchOr:   return parseOr  (toks,doc,level);
     }
 }
 
-bool Par::parseMny(Toks*toks, ParDoc &input, int level) {
+RetFlag Par::parseMny(Toks*toks, ParDoc &doc, int level) {
     
     int count = 0;
-    for (bool parsing=true; parsing;) {
+    
+    for (RetFlag ret=kRetZero; ret!=kRetNope && *doc.chr;) {
         
         switch (matching) {
                 
-            case kMatchRegx: parsing = parseRegx(toks,input,level); break;
-            case kMatchQuo:  parsing = parseQuo (toks,input,level); break;
-            case kMatchAnd:  parsing = parseAnd (toks,input,level); break;
-            case kMatchOr:   parsing = parseOr  (toks,input,level); break;
+            case kMatchMeta:
+            case kMatchRegx: ret = parseRegx(toks,doc,level); break;
+                
+            case kMatchQuo:  ret = parseQuo (toks,doc,level); break;
+            case kMatchAnd:  ret = parseAnd (toks,doc,level); break;
+            case kMatchOr:   ret = parseOr  (toks,doc,level); break;
         }
-        if (parsing) {
+        if (ret!=kRetNope) {
             count++;
+            if (count==MaxCountDefault) {
+                PrintParseTok("\n*** %s:parseMany exceeded maximum count:%i ***\n",name.c_str(),MaxCountDefault);
+                return kRetNope;
+            }
         }
     }
-    return (count>0);
+    return (count>0 ? kRetMatch : kRetNope);
 }
 
-bool Par::parseAny(Toks*toks, ParDoc &input, int level) {
+RetFlag Par::parseAny(Toks*toks, ParDoc &doc, int level) {
 
-    // parse parList
-    
-    for (bool parsing=true; parsing;) {
+    int count = 0;
+
+    for (RetFlag ret=kRetZero; ret!=kRetNope && *doc.chr;) {
         
         switch (matching) {
+                
+            case kMatchMeta:
+            case kMatchRegx: ret = parseRegx(toks,doc,level); break;
             
-            case kMatchRegx: parsing = parseRegx(toks,input,level); break;
-            case kMatchQuo:  parsing = parseQuo (toks,input,level); break;
-            case kMatchAnd:  parsing = parseAnd (toks,input,level); break;
-            case kMatchOr:   parsing = parseOr  (toks,input,level); break;
+            case kMatchQuo:  ret = parseQuo (toks,doc,level); break;
+            case kMatchAnd:  ret = parseAnd (toks,doc,level); break;
+            case kMatchOr:   ret = parseOr  (toks,doc,level); break;
         }
+        if (ret!=kRetNope) {
+            count++;
+            if (count==MaxCountDefault) {
+                PrintParseTok("\n*** %s:parseMany exceeded maximum count:%i",name.c_str(),MaxCountDefault);
+                exit(-1);
+                return kRetNope;
+            }
+       }
     }
-    return true;
+    return (count>0 ? kRetMatch : kRetZero);
 }
 
-bool Par::parseOpt(Toks*toks, ParDoc &input, int level) {
-    
+RetFlag Par::parseOpt(Toks*toks, ParDoc &doc, int level) {
+
+    RetFlag ret;
     switch (matching) {
-        
-        case kMatchRegx: parseRegx(toks,input,level); break;
-        case kMatchQuo:  parseQuo (toks,input,level); break;
-        case kMatchAnd:  parseAnd (toks,input,level); break;
-        case kMatchOr:   parseOr  (toks,input,level); break;
+            
+        case kMatchMeta:
+        case kMatchRegx: ret = parseRegx(toks,doc,level); break;
+            
+        case kMatchQuo:  ret = parseQuo (toks,doc,level); break;
+        case kMatchAnd:  ret = parseAnd (toks,doc,level); break;
+        case kMatchOr:   ret = parseOr  (toks,doc,level); break;
     }
-    return true;
+    switch (ret) {
+        
+        case kRetNope:  return kRetZero;
+        case kRetZero:  return kRetZero;
+        case kRetMatch: return kRetMatch;
+        case kRetEnd:   return kRetEnd;
+    }
 }
 
 #pragma mark - and or
 
-bool Par::parseAnd(Toks*toks, ParDoc &input, int level) {
-
-    if (parList.size()==0) {
-        return false;
-    }
-    PushTok
-    for (Par *par : parList) {
-       
-        if (!par->parse(toks, input,level)) {
-            
-            PopTok
-            return false;
-        }        
-    }
-    return true;
-}
-
-bool Par::parseOr(Toks*toks, ParDoc &input, int level) {
+RetFlag Par::parseAnd(Toks*toks, ParDoc &doc, int level) {
     
     if (parList.size()==0) {
-        return false;
+        return kRetNope;
+    }
+    PushTok
+    
+    Par *meta = 0;
+    
+    for (Par *par : parList) {
+        
+        // skip b in '(a ~b c)'
+        if (par->matching==kMatchMeta) {
+            meta = par;
+            if (meta==parList.back()) {
+                for (int row = doc.row; row==doc.row && *doc.chr;) {
+                    meta->parseRegx(toks, doc, level+1);
+                }
+            }
+            else {
+                continue;
+            }
+        }
+        else if (!meta) {
+            RetFlag ret = par->parse(toks, doc,level);
+            if (ret & (kRetNope|kRetEnd)) {
+                PopTok
+                return kRetNope;
+            }
+        }
+        // allow for b in (a ~b c?) or (a ~b c*)
+        else {
+            for (int row = doc.row; row==doc.row && *doc.chr;) {
+                
+                if (par->parse(toks, doc,level)==kRetMatch) {
+                    goto ok;
+                }
+                else if (meta->parseRegx(toks, doc, level+1)==kRetMatch) {
+                    continue;
+                }
+                else {
+                    meta = 0;
+                    break;
+                }
+            }
+        }
+    ok: continue;
+    }
+    return kRetMatch;
+}
+
+RetFlag Par::parseOr(Toks*toks, ParDoc &doc, int level) {
+    
+    if (parList.size()==0) {
+        return kRetNope;
     }
     PushTok
     for (Par *par : parList) {
         
-        if (par->parse(toks, input,level)) {
-            return true;
+        RetFlag ret = par->parse(toks, doc,level);
+        if (ret!=kRetNope) {
+            return kRetMatch;
         }
      }
     PopTok
 
-    return false;
+    return kRetNope;
 }        
 
 #pragma mark - parse leaf
 
-bool Par::parseQuo(Toks*toks, ParDoc &input, int level) {
+RetFlag Par::parseQuo(Toks*toks, ParDoc &doc, int level) {
     
-    if (match.quo && match.quo->parse(input)) {
+    if (match.quo && match.quo->parse(doc)) {
         
-        pushTok(toks,level,input);
-        return true;
-        
-    } else {
-        
-        return false;
+        pushTok(toks,level,doc);
+        return kRetMatch;
     }
-} 
-bool Par::parseRegx(Toks*toks, ParDoc &input, int level) {
+    return kRetNope;
+}
+
+RetFlag Par::parseRegx(Toks*toks, ParDoc &doc, int level) {
     
-    if (match.regx && match.regx->parse(input)) {
+    if (match.regx && match.regx->parse(doc)) {
         
-        // ignore discardible regex such as r'^[\\(]' in (r'^[\\(]' (who why*)+ r'^[\\)]')
+        // anonymous regx is named "?"
         
-        if (name!="?") {
+        if (name=="?") {
             
-            printLevelInputMargin(level, input);
+            Tok*back = toks->back();
+            *back->value =  (match.regx->result2.size() > 0
+                             ? match.regx->result2
+                             : match.regx->result);
+        }
+        else {
+            
+            printLevelInputMargin(level, doc);
             PrintParseTok("%s: %s\n", name.c_str(),(const char*)*match.regx);
             
             Tok*token = new Tok(name,(const char*)*match.regx,level);
             toks->push_back(token);
         }
-        return true;
-        
-    } else  {
-        
-        return false;
+        return kRetMatch;
     }
+    return kRetNope;
 }

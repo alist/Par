@@ -1,16 +1,13 @@
 
-Par extends PCRE regular expressions with a symbolic toked stream. For example:
+Par extends PCRE regular expressions with a symbolic toked stream.
+
+For example, the grammar
 
     def (hello world)
     hello ('hello')
     world ('world')
 
-
-will parse the following string
-
-    "hello world"
-
-to produce the following token stream
+    "hello world" // will convert this string into the following token stream
 
     0, 1: def :
     1, 2:  hello : hello
@@ -37,7 +34,7 @@ So, the the regex patterns behave as expected, including:
     '?' as an optional and
     '$' to match at the end of the line
 
-So, the following def
+So, the grammar:
 
     def (hello | world)+
     hello ('^he?ll?o')
@@ -50,9 +47,9 @@ So, the following def
     2, 1: def :
     3, 2:  world : wrld
 
-One thing to keep in mind is that as Par matches a pattern it will
-advance the document pointer to the next non-whitespace character.
-So the following def with 'world' and 'hello' reversed:
+As Par matches a pattern it can advance the document pointer
+to the next non-whitespace character. So, the following grammar
+with 'world' and 'hello' reversed:
 
     def (world | hello)+
     hello ('hello')
@@ -150,9 +147,62 @@ we could combine everything together in a compound statement like, so:
 
     "hello beautiful world (yo) 😊" // resulting in a single token
 
-    0, 1: woohoo :
+     0, 1: woohoo : 😊
+
+Of course, 'hello' and 'world' could refer to more complex patterns to match:
+
+    def (hello world)+
+    hello (i'^hello' | i'(good (morning|afternoon|evening))')
+    world (i'^world' | i'^planet' | i'^earth')
+
+    "good morning planet"
+
+    0, 1: def :
+    1, 2:  hello : good morning
+    2, 2:  world : planet
+
+Both hello(...) and world(...) are two islands. Use a '~' to build a bridge.
+The following grammar uses '~extra' to bridge between 'hello' and 'world'
+
+    def (hello ~extra world)+
+    hello (i'^hello' | i'(good (morning|afternoon|evening))')
+    world (i'^world' | i'^planet' | i'^earth')
+
+    "good morning big beautiful planet" // resulting in:
+
+    0, 1: def :
+    1, 2:  hello : good morning
+    2, 2:  extra : big
+    3, 2:  extra : beautiful
+    4, 2:  world : planet
 
 
+RECURSION
 
+Right recursion is allowed; as long as there is preceeding pattern
+that matches one more times
+
+    def (hello def? ~extra world)+
+    hello (i'^hello'|i'(good (morning|afternoon|evening))')
+    world (i'^world'|i'^planet'|i'^earth')
+
+    "Hello and a good morning big beautiful planet earth"
+
+    0, 1: def :
+    1, 2:  hello : Hello
+    2, 2:  def :
+    3, 3:   hello : good morning
+    4, 3:   extra : big
+    5, 3:   extra : beautiful
+    6, 3:   world : planet
+    7, 2:  world : earth
+
+Left recursion will exit the app, so:
+
+    def (def? hello world) ... // or
+    def (hello* def? world) ... // for
+
+    "hello world " // will result in the following message
+    *** def:parse exceeded maximum levels:200 ***
 
 
