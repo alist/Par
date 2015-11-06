@@ -6,7 +6,13 @@ def (par list)+
 
 par (name)
 
-list ("(" (ors | ands | item | list)+ ")" repeat? )
+list ("(" (waves | ors | ands | item | list)+ ")" repeat? )
+
+  waves (item (wave (ors | ands | item))+ )
+    wave ('^[\~][^A-Za-z0-9_]')
+
+    orandits (ors | ands | item)
+    andits (ands | item)
 
   ors (item ("|" (ands | item))+ ) // explicit '|' has precedence over implicit ' '
 

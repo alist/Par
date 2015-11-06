@@ -13,7 +13,9 @@ struct Tok {
     int level;                      // all Toks have position withing a parsing hierarchy
     
     Tok(){}
-    Tok (string &name, const char*value_, int level_);
-
+    Tok (string &name, const char*charp, int level_);
+    Tok (string &name, const char*charp, int startIdx, int endIdx, int level_);
+    void setTokType(string&name);
+    
    ~Tok() {}
 };

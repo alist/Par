@@ -1,4 +1,5 @@
-def (~d aloha | ~a hello ~b world? ~c)+
+def (aloha ~ hello ~ world ~ greet)
+aloha (i'^aloha')
 hello (i'^hello'|i'^(good (morning|afternoon|evening))')
 world (i'^world'|i'^planet'|i'^earth')
-aloha (i'^aloha')
+greet (i'^yours truly')

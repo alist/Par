@@ -23,12 +23,12 @@ struct ParQuo {
             delete pattern;
         }
     }
-    virtual bool parse(ParDoc &input) {
+    virtual bool parse(ParDoc &doc) {
         
-        if (strncmp(input.chr,pattern,size)==0) {
+        if (strncmp(doc.ptr(),pattern,size)==0) {
             
-            input += (int)size;
-            input.eatWhitespace();
+            doc += (int)size;
+            doc.eatWhitespace();
             return true;
         }
         return false;

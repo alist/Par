@@ -97,7 +97,7 @@ struct ParRegx  {
         if (advanceDoc==false && matchDocId==doc.docId) {
             return false;
         }
-        if (re && match(doc.chr)) {
+        if (re && match(doc.ptr())) {
             
             matchDocId = doc.docId;
             found = true;
@@ -120,7 +120,7 @@ struct ParRegx  {
                 }
                 // ('(m(ee)?t)') // "mt" => "mt"
                 else {
-                     result.assign(doc.chr + ovector[2], size);
+                     result.assign(doc.ptr() + ovector[2], size);
                 }
                 if (advanceDoc) {
                     doc += ovector[1]; // end of total parse
@@ -144,7 +144,7 @@ struct ParRegx  {
                 }
                  // ('one') // "one" => "one"
                 else {
-                    result.assign(doc.chr + ovector[0], size);
+                    result.assign(doc.ptr() + ovector[0], size);
                 }
                 if (advanceDoc) {
                     doc += ovector[1]; // end of total parse

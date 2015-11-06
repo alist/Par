@@ -115,6 +115,13 @@ int ParDef::addList(Par*par,Toks*toks,int toki) {
                 return toki;
             }
                 
+            case str2int("waves"): {
+                
+                Par *pari = new Par(kMatchWave);
+                par->parList.push_back(pari);
+                toki = addList(pari, toks, toki);
+                break;
+            }
             case str2int("ands"): {
                 
                 Par *pari = new Par(kMatchAnd);
@@ -122,7 +129,7 @@ int ParDef::addList(Par*par,Toks*toks,int toki) {
                 toki = addList(pari, toks, toki);
                 break;
             }
-                
+
             case str2int("ors"): {
                 
                 Par *pari = new Par(kMatchOr);

@@ -141,40 +141,14 @@ such as ()[]{}!$^*? .
     5, 2:  emoji : 😊
 
 Notice that 'paren(...)' combined literals and symbols. If the values are not needed,
-we could combine everything together in a compound statement like, so:
+we could go crazy and combine everything together in a compound statement like, so:
 
     woohoo ('hello' 'world' ("(" i'[a-z ]*' ")")? '^😊|😃|😏|😈')+
 
     "hello beautiful world (yo) 😊" // resulting in a single token
 
-     0, 1: woohoo : 😊
+    0, 1: woohoo : 😊 // notice that only the last match is applied to the token woohoo
 
-Of course, 'hello' and 'world' could refer to more complex patterns to match:
-
-    def (hello world)+
-    hello (i'^hello' | i'(good (morning|afternoon|evening))')
-    world (i'^world' | i'^planet' | i'^earth')
-
-    "good morning planet"
-
-    0, 1: def :
-    1, 2:  hello : good morning
-    2, 2:  world : planet
-
-Both hello(...) and world(...) are two islands. Use a '~' to build a bridge.
-The following grammar uses '~extra' to bridge between 'hello' and 'world'
-
-    def (hello ~extra world)+
-    hello (i'^hello' | i'(good (morning|afternoon|evening))')
-    world (i'^world' | i'^planet' | i'^earth')
-
-    "good morning big beautiful planet" // resulting in:
-
-    0, 1: def :
-    1, 2:  hello : good morning
-    2, 2:  extra : big
-    3, 2:  extra : beautiful
-    4, 2:  world : planet
 
 
 RECURSION
@@ -199,10 +173,43 @@ that matches one more times
 
 Left recursion will exit the app, so:
 
-    def (def? hello world) ... // or
-    def (hello* def? world) ... // for
+    def (def? hello world)  // or
+    def (hello* def? world) // for
 
     "hello world " // will result in the following message
+
     *** def:parse exceeded maximum levels:200 ***
 
+ISLAND PARSING
+
+To search multiple patterns as independant islands, use a wave '~' (tilde)
+to separate patterns to search in parallel. For Example, the following
+def search for 5 regx patterns in parallel:
+
+    def (aloha ~ hello ~ world ~ greet)+
+
+    aloha (i'^aloha')
+    hello (i'^hello'|i'^(good (morning|afternoon|evening))')
+    world (i'^world'|i'^planet'|i'^earth')
+    greet (i'^yours truly')
+
+    // Given the following input document
+    
+    "Yo! Good morning big beautiful planet earth - Aloha from yours truly."
+
+    // produced the following token stream (#,level: name, value)
+
+    0, 1: ~      : Yo!
+    1, 2:  hello : Good morning
+    2, 1: ~      : big beautiful
+    3, 2:  world : planet
+    4, 2:  world : earth
+    5, 1: ~      : -
+    6, 2:  aloha : Aloha
+    7, 1: ~      : from
+    8, 2:  greet : yours truly
+    9, 1: ~      : .
+
+The '~' tokens are the unmatched portions from the document -- the water between
+the islands.
 

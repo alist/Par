@@ -23,6 +23,7 @@ typedef enum {
     kMatchAnd,
     kMatchOr,
     kMatchMeta,
+    kMatchWave,
 } MatchType;
 
 struct Par;
@@ -101,6 +102,7 @@ struct Par {
     RetFlag parseOpt (Toks*, ParDoc&, int level);
     
     RetFlag parseMeta(Toks*, ParDoc&, int level, Par *&meta, Par*par);
+    RetFlag parseWave(Toks*, ParDoc&, int level);
     RetFlag parseAnd (Toks*, ParDoc&, int level);
     RetFlag parseOr  (Toks*, ParDoc&, int level);
     RetFlag parseQuo (Toks*, ParDoc&, int level);

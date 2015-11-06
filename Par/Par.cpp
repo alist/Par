@@ -24,20 +24,24 @@ void Par::init() {
     match.regx = 0;
     memoMe = -1;
 }
+
 void Par::init(RepeatType repeat_) {
     init();
     repeat = repeat_;
 }
+
 void Par::init(MatchType matching_) {
     
     init();
     matching = matching_;
 }
+
 void Par::init(ParRegx*rx) {
     init();
     matching = kMatchRegx;
     match.regx = rx;
 }
+
 void Par::init(ParQuo*quo) {
     init();
     matching = kMatchQuo;
@@ -71,10 +75,12 @@ Par& Par::operator =(Par&p_)  {
     match.quo  = p_.match.quo;
     return *this;
 }
+
 Par &Par::operator [](int index) {
     
     return *parList[index];
 }
+
 Par::operator float() {
     
     return (match.regx ? (float)(*match.regx) : 
@@ -85,6 +91,7 @@ Par::operator int() {
     return (match.regx ? (int)(*match.regx) : 
             match.quo  ? (int)(*match.quo)  :  -1);
 }
+
 Par::operator const char *() {
     
     return (match.regx ? (const char*)(*match.regx) : 
@@ -97,11 +104,12 @@ inline void Par::printLevelIndent(int level) {
         PrintParseTok(" ");
     }
 }
+
 inline void Par::printLevelInputMargin(int level, ParDoc&doc) {
 
     // print a slice of the doc to parse
     PrintParseTok("⦙");
-    char *cp =doc.chr;
+    char *cp =doc.ptr();
     for (int i=0; i<9; i++) {
         
         if (*cp=='\n' || *cp=='\r') {
@@ -126,7 +134,7 @@ inline void Par::printLevelInputMargin(int level, ParDoc&doc) {
 #define PushTok ParDoc prev = doc; int tokenSizeBefore = pushTok(toks,level,doc);
 #define PopTok  doc = prev; popTok(toks,tokenSizeBefore);
 
-int Par::pushTok(Toks*toks, int level, ParDoc&doc) {
+inline int Par::pushTok(Toks*toks, int level, ParDoc&doc) {
     
     int ret = (int)toks->size();
     if (name.size()>0 && name[0]!='?') {
@@ -140,7 +148,7 @@ int Par::pushTok(Toks*toks, int level, ParDoc&doc) {
     return ret;
 }
 
-void Par::popTok(Toks*toks, int tokenSizeBefore) {
+inline void Par::popTok(Toks*toks, int tokenSizeBefore) {
     
     while (toks->size()>tokenSizeBefore) {
         
@@ -174,6 +182,7 @@ RetFlag Par::parseOne(Toks*toks, ParDoc &doc, int level) {
         case kMatchMeta:
         case kMatchRegx: return parseRegx(toks,doc,level);
             
+        case kMatchWave: return parseWave(toks,doc,level);
         case kMatchQuo:  return parseQuo (toks,doc,level);
         case kMatchAnd:  return parseAnd (toks,doc,level);
         case kMatchOr:   return parseOr  (toks,doc,level);
@@ -184,13 +193,14 @@ RetFlag Par::parseMny(Toks*toks, ParDoc &doc, int level) {
     
     int count = 0;
     
-    for (RetFlag ret=kRetZero; ret!=kRetNope && *doc.chr;) {
+    for (RetFlag ret=kRetZero; ret!=kRetNope && doc.hasMore();) {
         
         switch (matching) {
                 
             case kMatchMeta:
             case kMatchRegx: ret = parseRegx(toks,doc,level); break;
                 
+            case kMatchWave: ret = parseWave(toks,doc,level); break;
             case kMatchQuo:  ret = parseQuo (toks,doc,level); break;
             case kMatchAnd:  ret = parseAnd (toks,doc,level); break;
             case kMatchOr:   ret = parseOr  (toks,doc,level); break;
@@ -210,13 +220,14 @@ RetFlag Par::parseAny(Toks*toks, ParDoc &doc, int level) {
 
     int count = 0;
 
-    for (RetFlag ret=kRetZero; ret!=kRetNope && *doc.chr;) {
+    for (RetFlag ret=kRetZero; ret!=kRetNope && doc.hasMore();) {
         
         switch (matching) {
                 
             case kMatchMeta:
             case kMatchRegx: ret = parseRegx(toks,doc,level); break;
             
+            case kMatchWave: ret = parseWave(toks,doc,level); break;
             case kMatchQuo:  ret = parseQuo (toks,doc,level); break;
             case kMatchAnd:  ret = parseAnd (toks,doc,level); break;
             case kMatchOr:   ret = parseOr  (toks,doc,level); break;
@@ -241,6 +252,7 @@ RetFlag Par::parseOpt(Toks*toks, ParDoc &doc, int level) {
         case kMatchMeta:
         case kMatchRegx: ret = parseRegx(toks,doc,level); break;
             
+        case kMatchWave: ret = parseWave(toks,doc,level); break;
         case kMatchQuo:  ret = parseQuo (toks,doc,level); break;
         case kMatchAnd:  ret = parseAnd (toks,doc,level); break;
         case kMatchOr:   ret = parseOr  (toks,doc,level); break;
@@ -261,7 +273,7 @@ inline RetFlag Par::parseMeta(Toks *toks, ParDoc&doc, int level, Par *&meta, Par
     if (par->matching==kMatchMeta) {
         meta = par;
         if (meta==parList.back()) {
-            for (int row = doc.row; row==doc.row && *doc.chr;) {
+            for (int row = doc.row; row==doc.row && doc.hasMore();) {
                 meta->parseRegx(toks, doc, level+1);
             }
         }
@@ -269,7 +281,7 @@ inline RetFlag Par::parseMeta(Toks *toks, ParDoc&doc, int level, Par *&meta, Par
     // allow for b in (a ~b c?) or (a ~b c*)
     else if (meta) {
         
-        for (int row = doc.row; row==doc.row && *doc.chr;) {
+        for (int row = doc.row; row==doc.row && doc.hasMore();) {
             
             if (par->parse(toks, doc,level)==kRetMatch) {
                 return kRetMatch;
@@ -289,11 +301,81 @@ inline RetFlag Par::parseMeta(Toks *toks, ParDoc&doc, int level, Par *&meta, Par
     return kRetMatch;
 }
 
+/*
+def (a ~ b ~ c ~ d) {
+    
+    doc        par            prior    tokens
+    ⦙x c y z b⦙ (*a b c d e)
+    ⦙x c y z b⦙ (a *b c d e)
+    ⦙x c y z b⦙ (a b *c d e) => "x"
+    
+    ⦙c y z b c⦙ (*a b c d e)
+    ⦙c y z b c⦙ (a *b c d e)
+    ⦙c y z b c⦙ (a b *c d e) =>        (~,"x"),(c,"c")
+    
+    ⦙y z b c  ⦙ (*a b c d e)
+    ⦙y z b c  ⦙ (a *b c d e)
+    ⦙y z b c  ⦙ (a b *c d e) =>  "y"
+    
+    ⦙z b c    ⦙ (*a b c d e)
+    ⦙z b c    ⦙ (a *b c d e)
+    ⦙z b c    ⦙ (a b *c d e) =>  "y z"
+    
+    ⦙b c      ⦙ (*a b c d e)
+    ⦙b c      ⦙ (a *b c d e)         (~,"x"),(c,"c"),(~,"y z"),(b,"b")
+    
+    ⦙c        ⦙ (*a b c d e)
+    ⦙c        ⦙ (a *b c d e)
+    ⦙c        ⦙ (a b *c d e)         (~,"x"),(c,"c"),(~,"y z"),(b,"b")(c,"c")
+}
+*/
+
+RetFlag Par::parseWave(Toks*toks, ParDoc &doc, int level) {
+    
+    int count = 0;
+    int startIdx = doc.idx; // start of unmatched string
+    static string wave = "~     ";
+    while (doc.hasMore()) {
+        
+        int priorIdx = doc.idx;
+        
+        for (Par *par : parList) {
+            
+            if (par->parse(toks, doc,level)==kRetMatch) {
+                
+                count ++;
+                
+                // insert prior unmatched words as a Tok("~wave",...)
+                
+                if (startIdx < priorIdx) {
+                    int endIdx = doc.trimSpace(priorIdx);
+                    Tok*unmatched = new Tok(wave,doc._chr,startIdx,endIdx,level);
+                    
+                    // insert unmatched before matched
+                    Tok*matched = toks->back();
+                    toks->pop_back();
+                    toks->push_back(unmatched);
+                    toks->push_back(matched);
+                }
+                startIdx = doc.idx;
+                goto skip; // already advanced to enxt word
+            }
+        }
+        doc.nextWord();
+    skip:
+        continue;
+    }
+    if (count>0 && startIdx < doc.idx) {
+        Tok*unmatched = new Tok(wave,doc._chr,startIdx,doc.idx,level);
+        toks->push_back(unmatched);
+    }
+
+    return (count>0 ? kRetMatch : kRetNope);
+}
+
+
 RetFlag Par::parseAnd(Toks*toks, ParDoc &doc, int level) {
     
-    if (parList.size()==0) {
-        return kRetNope;
-    }
     PushTok
     
     Par *meta = 0;
@@ -303,24 +385,23 @@ RetFlag Par::parseAnd(Toks*toks, ParDoc &doc, int level) {
         switch (parseMeta(toks,doc,level,meta,par)) {
             
             case kRetNope:
-            case kRetEnd:
-            
-            PopTok
-            return kRetNope;
-
+            case kRetEnd: {
+                
+                PopTok
+                return kRetNope;
+            }
             case kRetZero:
-            case kRetMatch:
-            break;
-         }
+            case kRetMatch: {
+                
+                break;
+            }
+        }
     }
     return kRetMatch;
 }
 
 RetFlag Par::parseOr(Toks*toks, ParDoc &doc, int level) {
     
-    if (parList.size()==0) {
-        return kRetNope;
-    }
     PushTok
     for (Par *par : parList) {
         
@@ -336,6 +417,8 @@ RetFlag Par::parseOr(Toks*toks, ParDoc &doc, int level) {
 
 #pragma mark - parse leaf
 
+/* match string 
+ */
 RetFlag Par::parseQuo(Toks*toks, ParDoc &doc, int level) {
     
     if (match.quo && match.quo->parse(doc)) {
@@ -346,6 +429,8 @@ RetFlag Par::parseQuo(Toks*toks, ParDoc &doc, int level) {
     return kRetNope;
 }
 
+/* match regular expression 
+ */
 RetFlag Par::parseRegx(Toks*toks, ParDoc &doc, int level) {
     
     if (match.regx && match.regx->parse(doc)) {
@@ -356,7 +441,7 @@ RetFlag Par::parseRegx(Toks*toks, ParDoc &doc, int level) {
             
             Tok*back = toks->back();
             *back->value =  (match.regx->result2.size() > 0
-                             ? match.regx->result2
+                             ? match.regx->result2 // use b in ('a'=>'b')
                              : match.regx->result);
         }
         else {

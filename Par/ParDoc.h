@@ -2,37 +2,39 @@
 
 struct ParDoc {
     
-    static std::vector<ParDoc*> Stack;
-    //static ParDoc Deepest;
- 
-    char*chr;
+    char*_chr;
     int row;
     int col;
     int size;
+    int idx;
     int docId;
+    
     static int nextDocId;
     
     ParDoc() {
         
         docId = nextDocId++;
-        chr = 0;
+        _chr = 0;
         row = 0;
         col = 0;
         size = 0;
     }
 
-    ParDoc(char*char_){
+    ParDoc(char*chr_){
         
         docId = nextDocId++;
-        chr = char_;
+        _chr = chr_;
         row = 0;
         col = 0;
-        size = (int)strlen(chr);
-        //Deepest = *this;
+        idx = 0;
+        size = (int)strlen(_chr);
     }
-    
+    char*ptr() {return _chr+idx;}
+    bool nextWord();
+    bool hasMore();
     void operator = (ParDoc&p_);
     bool operator == (ParDoc&p_);
     void operator += (int offset);
+    int trimSpace(int i);
     void eatWhitespace();
 };
