@@ -1,4 +1,6 @@
 #import <vector>
+#import <stdlib.h>
+#import <string.h>
 
 struct ParDoc {
     
@@ -28,7 +30,39 @@ struct ParDoc {
         col = 0;
         idx = 0;
         size = (int)strlen(_chr);
+
     }
+    // create substring by forcing a terminating char
+    char pushCutHack(int cutIdx) {
+ 
+        if (cutIdx>size-1) {
+            return '\0';
+        }
+        else {
+            char hack =_chr[cutIdx];
+            _chr[cutIdx] = '\0';
+            return hack;
+        }
+    }
+    // restore from substring
+    void popCutHack(int cutIdx,char hack) {
+        
+        if (cutIdx<size) {
+            _chr[cutIdx] = hack;
+        }
+    }
+    
+    ParDoc(ParDoc&p_, int startIdx, int endIdx) {
+
+        size = endIdx-startIdx;
+        _chr = (char*)malloc(size+1);
+        strncpy(_chr, p_._chr+startIdx,size);
+        _chr[size]='\0';
+        row = 0;
+        col = 0;
+        idx = 0;
+    }
+   
     char*ptr() {return _chr+idx;}
     bool nextWord();
     bool hasMore();

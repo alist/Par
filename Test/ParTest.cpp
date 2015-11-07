@@ -10,5 +10,4 @@ void ParTest() {
     ParDef *parDef = new ParDef();
     parDef->initWithFile("Hello.def");
     parDef->parseFile("Hello.test");
-      
 }

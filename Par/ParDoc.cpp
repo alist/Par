@@ -2,9 +2,12 @@
 
 #pragma GCC diagnostic ignored "-Wwrite-strings"  
 
+
 int ParDoc::nextDocId = 1000;
 
-void ParDoc::operator =(ParDoc&p_) {
+/* this is used for backtracking, so does not own string
+ */
+void ParDoc::operator = (ParDoc&p_) {
  
     docId = nextDocId++;
     _chr = p_._chr;
@@ -12,15 +15,17 @@ void ParDoc::operator =(ParDoc&p_) {
     row  = p_.row;
     col  = p_.col;
     size = p_.size;
-
 }
 
 bool ParDoc::operator == (ParDoc&p_) {
     
     if (row == p_.row &&
-        col == p_.col)
+        col == p_.col) {
         return true;
-    else return false;
+    }
+    else {
+        return false;
+    }
 }
 
 void ParDoc::operator += (int offset) {
@@ -80,6 +85,7 @@ void ParDoc::eatWhitespace() {
 }
 
 bool ParDoc::hasMore() {
+    
     if  (idx < size-1) {
         return true;
     }

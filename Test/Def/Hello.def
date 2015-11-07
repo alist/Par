@@ -1,5 +1,6 @@
-def (aloha ~ hello ~ world ~ greet)
-aloha (i'^aloha')
-hello (i'^hello'|i'^(good (morning|afternoon|evening))')
-world (i'^world'|i'^planet'|i'^earth')
-greet (i'^yours truly')
+sentence ('^yo' ~hello punct)
+punct ('[.!?]')
+yo (hello ~bigb world)
+hello (i'^hello')
+world (i'^world')
+extra  ('^beautiful'|'^big'|'^world')+

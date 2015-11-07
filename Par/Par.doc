@@ -1,4 +1,12 @@
 
+Files
+
+Def.def - marcros that bootstrap the Par parser
+Def.par - what the Par looks like defined by itself
+ParTokDef
+
+
+
 Par extends PCRE regular expressions with a symbolic toked stream.
 
 For example, the grammar
@@ -37,7 +45,7 @@ So, the the regex patterns behave as expected, including:
 So, the grammar:
 
     def (hello | world)+
-    hello ('^he?ll?o')
+    hello ('he?ll?o')
     world ('wo?rld$')
 
     "hlo yo wrld" // will match "hlo", ignore "yo" and match "wrld"
@@ -47,7 +55,7 @@ So, the grammar:
     2, 1: def :
     3, 2:  world : wrld
 
-As Par matches a pattern it can advance the document pointer
+When Par matches a pattern it advances the document pointer past the match
 to the next non-whitespace character. So, the following grammar
 with 'world' and 'hello' reversed:
 
@@ -60,7 +68,7 @@ with 'world' and 'hello' reversed:
     0, 1: def :
     1, 2:  world : world
 
-To not advance the pointer, use a preceeding (n'...') like so
+To not advance the pointer, use a preceeding 'n' before the single quote, like so
 
     def (world | hello)+
     hello (n'hello')
@@ -73,10 +81,28 @@ To not advance the pointer, use a preceeding (n'...') like so
     2, 1: def :
     3, 2:  hello : hello
 
-Which comes in handy for island parsers.
-But, be careful, as it will only match once for the same document:
+Above, 'hello' and 'world' are NOT anchored. Could anchor to
+the beginning with '^' and '$', like so:
 
-    "hello world hello hello" // will still result in
+    def (hello world)
+    hello (n'^hello')
+    world (n'world$')
+
+    "hello big beautifil world" // which anchors to beginning and end
+
+    0, 1: def :
+    1, 2:  hello : hello
+    2, 2:  world : world
+
+To capture everything everthing between, use '~' infront of a name.
+like so:
+
+    def (hello ~middle world)
+    hello ('^hello')
+    world ('^world')
+
+
+    "hello big beautifil world" // will still result in
 
     0, 1: def :
     1, 2:  world : world
@@ -148,8 +174,6 @@ we could go crazy and combine everything together in a compound statement like, 
     "hello beautiful world (yo) 😊" // resulting in a single token
 
     0, 1: woohoo : 😊 // notice that only the last match is applied to the token woohoo
-
-
 
 RECURSION
 

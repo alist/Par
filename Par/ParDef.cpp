@@ -38,7 +38,9 @@ Toks *ParDef::parseFile(const char *filename) {
 
     char *buf = readFile(filename);
     if (buf) {
-        return parseBuf(buf);
+        Toks *toks = parseBuf(buf);
+        free(buf);
+        return toks;
     }
     else {
         DebugPrint("*** ParDef::parseFile(%s) - file not found\n", filename);
@@ -174,11 +176,17 @@ int ParDef::addList(Par*par,Toks*toks,int toki) {
             }
             case str2int("meta"): {
                 
-                ParRegx *rx = new ParRegx("'^\\w+");
-                Par*pari = new Par(rx);
+                Par *pari = new Par(kMatchMeta);
                 pari->name = *tok->value;
-                pari->matching = kMatchMeta;
                 par->parList.push_back(pari);
+                toki = addList(pari, toks, toki);
+
+//                ParRegx *rx = new ParRegx("'^\\w+");
+//                Par*pari = new Par(rx);
+//                pari->name = *tok->value;
+//                pari->matching = kMatchMeta;
+//                par->parList.push_back(pari);
+//                
                 break;
             }
                 
@@ -215,10 +223,16 @@ inline void ParDef::bindName(Par*par) {
     
     if (pari) {        // is this not a par?
         
-        if (pari!=par) {
+        if (par->matching == kMatchMeta) {
             
-            par->parList = pari->parList;     // replace with children with lvalue's children
-            par->match = pari->match;
+            Par *par2 = new Par(&name);
+            bindName(par2);
+            par->parList.push_back(par2);
+        }
+        else if (pari!=par) {
+            
+            par->parList  = pari->parList;     // replace with children with lvalue's children
+            par->match    = pari->match;
             par->matching = pari->matching;
             
             if (par->repeat==kRepOne) { ///???

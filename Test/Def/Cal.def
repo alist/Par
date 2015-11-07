@@ -1,4 +1,4 @@
-def (meeting|reminder)+
+def (meeting ~ reminder)+
 meeting (meet date+)
 meet (i'^(m(ee)?t)')
 date (dow|time)

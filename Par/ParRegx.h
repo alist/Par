@@ -11,6 +11,9 @@
   4) cp /usr/local/lib/libpcre* pcre/lib
  */
 
+//TODO: NFA DFAs https://swtch.com/~rsc/regexp/regexp1.html
+
+
 #import "pcre.h"
 
 using namespace std;
@@ -74,12 +77,6 @@ struct ParRegx  {
                 fprintf(stdout, " ");
             }
             fprintf(stdout, "^");
-        }
-    }
-    ~ParRegx() {
-
-        if (re) {
-            pcre_free(re);
         }
     }
     bool match(char* pattern) {
@@ -147,6 +144,7 @@ struct ParRegx  {
                     result.assign(doc.ptr() + ovector[0], size);
                 }
                 if (advanceDoc) {
+                    doc.frontBack(ovector[0],ovector[1]);
                     doc += ovector[1]; // end of total parse
                     doc.eatWhitespace();
                 }
