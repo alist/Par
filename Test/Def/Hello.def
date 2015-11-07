@@ -1,6 +1,6 @@
-sentence ('^yo' ~hello punct)
-punct ('[.!?]')
-yo (hello ~bigb world)
+doc (next+)
+next (~sent '[.!?]')
+sent (hello ~mo world ~oy)
 hello (i'^hello')
 world (i'^world')
-extra  ('^beautiful'|'^big'|'^world')+
+more  ('^beautiful'|'^big'|'^world')+

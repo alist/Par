@@ -301,11 +301,14 @@ RetFlag Par::parseWave(Toks*toks, ParDoc &doc, int level) {
     int count = 0;
     int startIdx = doc.idx; // start of unmatched string
     static string wave = "~    ";
+    
     while (doc.hasMore()) {
         
         int frontIdx = doc.idx;
         
         for (Par *par : parList) {
+
+            bool firstPar = true;
             
             if (par->parse(toks, doc,level)==kRetMatch) {
                 
@@ -318,14 +321,19 @@ RetFlag Par::parseWave(Toks*toks, ParDoc &doc, int level) {
                     Tok*unmatched = new Tok(wave,doc._chr,startIdx,endIdx,level+1);
                     
                     // insert unmatched before matched
-                    Tok*matched = toks->back();
-                    toks->pop_back();
-                    toks->push_back(unmatched);
-                    toks->push_back(matched);
+                    if (firstPar) {
+                          toks->push_back(unmatched);
+                    } else {
+                        Tok*prevTok=toks->back();
+                        toks->pop_back();
+                        toks->push_back(unmatched);
+                        toks->push_back(prevTok);
+                    }
                 }
                 startIdx = doc.idx;
                 goto skip; // already advanced to enxt word
             }
+            firstPar = false;
         }
         doc.nextWord();
     skip:
@@ -340,63 +348,76 @@ RetFlag Par::parseWave(Toks*toks, ParDoc &doc, int level) {
     return (count>0 ? kRetMatch : kRetNope);
 }
 
+inline void Par::parseMeta2(Toks *toks, ParDoc&doc, int level, Par *&meta, int count, int startIdx) {
+    
+    if (startIdx < doc.front) {
+        
+        int endIdx = doc.trimSpace(doc.front);
+       
+        Tok *prevTok;
+        if (count>1) {
+            prevTok = toks->back();
+            toks->pop_back();
+        }
+        if (meta->parList.size()) {
+            
+            int front = doc.front;
+            char hack = doc.pushCutHack(front);
+            int pushIdx = doc.idx;
+            doc.idx = startIdx;
+            
+            for (Par*metai :meta->parList) {
+                metai->parse(toks, doc, level+1);
+            }
+            doc.idx = pushIdx;
+            doc.popCutHack(front, hack);
+        }
+        else {
+            Tok*unmatched = new Tok(meta->name,doc._chr,startIdx,endIdx,level+1);
+            toks->push_back(unmatched);
+        }
+        if (count>1) {
+            toks->push_back(prevTok);
+        }
+    }
+
+}
 /* capture all the words between matches
  */
-inline RetFlag Par::parseMeta(Toks *toks, ParDoc&doc, int level, Par *&meta, Par*par) {
+inline RetFlag Par::parseMeta(Toks *toks, ParDoc&doc, int level, Par *&meta, Par*par, int count) {
     
     // for b in '(a ~b c)'
     if (par->matching==kMatchMeta) {
         
         meta = par;
-        if (meta==parList.back()) {
-            for (int row = doc.row; row==doc.row && doc.hasMore();) {
-                meta->parseRegx(toks, doc, level+1);
-            }
+        
+        // for b in (a ~b)
+        if (meta==parList.back() && doc.hasMore()) {
+            
+            printLevelInputMargin(level, doc);
+            PrintParseTok("%s: %s\n", meta->name.c_str(),doc.ptr());
+            
+            Tok*token = new Tok(meta->name,doc.ptr(),level+1);
+            toks->push_back(token);
         }
     }
     // for a in (a ~b c)
     else if (!meta) {
         return par->parse(toks, doc,level);
     }
-    // for c in  (a ~b c?) or (a ~b c*)
+    // for c in  (a ~b c?), were meta == b
     else /* (meta) */{
         
         int startIdx = doc.idx;
-        int frontIdx = startIdx;
-
-        for (int row = doc.row; row==doc.row && doc.hasMore();) {
-
+        
+        while (doc.hasMore()) {
+            
             if (par->parse(toks, doc,level)==kRetMatch) {
                 
-                if (startIdx < frontIdx) {
-                    
-                    // prepare to insert meta before mateched token
-                    Tok*matched = toks->back();
-                    toks->pop_back();
-                    int endIdx = doc.trimSpace(frontIdx);
-                    if (meta->parList.size()) {
-                        
-                        char hack = doc.pushCutHack(frontIdx);
-                        doc.idx = startIdx;
-                        
-                        for (Par*metai :meta->parList) {
-                            metai->parse(toks, doc, level+1);
-                        }
-                        doc.idx = frontIdx;
-                        doc.popCutHack(frontIdx, hack);
-                    }
-                    else {
-                        Tok*unmatched = new Tok(meta->name,doc._chr,startIdx,endIdx,level+1);
-                        
-                        // insert unmatched before matched
-                        toks->push_back(unmatched);
-                    }
-                    toks->push_back(matched);
-                }
+                parseMeta2(toks, doc, level, meta, count, startIdx);
                 return kRetMatch;
             }
             else if (doc.nextWord()) {
-                frontIdx = doc.idx;
                 continue;
             }
             else {
@@ -413,10 +434,11 @@ RetFlag Par::parseAnd(Toks*toks, ParDoc &doc, int level) {
     PushTok
     
     Par *meta = 0;
+    int count = 0;
     
     for (Par *par : parList) {
-        
-        switch (parseMeta(toks,doc,level,meta,par)) {
+       
+        switch (parseMeta(toks,doc,level,meta,par,count++)) {
             
             case kRetNope:
             case kRetEnd: {

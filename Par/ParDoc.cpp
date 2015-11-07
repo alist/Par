@@ -1,4 +1,5 @@
 #import "ParDoc.h"
+#import "stdlib.h"
 
 #pragma GCC diagnostic ignored "-Wwrite-strings"  
 
@@ -12,15 +13,13 @@ void ParDoc::operator = (ParDoc&p_) {
     docId = nextDocId++;
     _chr = p_._chr;
     idx  = p_.idx;
-    row  = p_.row;
-    col  = p_.col;
     size = p_.size;
+    front = p_.front;
 }
 
 bool ParDoc::operator == (ParDoc&p_) {
     
-    if (row == p_.row &&
-        col == p_.col) {
+    if (idx == p_.idx) {
         return true;
     }
     else {
@@ -30,19 +29,14 @@ bool ParDoc::operator == (ParDoc&p_) {
 
 void ParDoc::operator += (int offset) {
     
-    for (int i=0; i<offset; i++, idx++) {
-        
-        switch (_chr[idx]) {
-                
-            case '\0': return;
-            case '\t': col = (col|0x3)+1; break; // for tabs==4 chr
-            case '\n': col = 0; row++; break;
-            case '\r': break;
-            default: col++; break;
-        }
-    }
+    idx = std::min(idx+offset,size-1);
+    
 }
+void ParDoc::frontBack(int frontOffset, int backOffset) {
 
+    front = std::min(idx+frontOffset,size-1);
+    idx   = std::min(idx+backOffset,size-1);
+}
 
 bool ParDoc::nextWord() {
     
@@ -75,10 +69,10 @@ void ParDoc::eatWhitespace() {
         switch (_chr[idx]) {
                 
             case '\0': return;
-            case '\t': col = (col|0x3)+1; break; // for tabs==4 chr
-            case '\n': col = 0; row++; break;
+            case '\t': break; 
+            case '\n': break;
             case '\r': break;
-            case  ' ': col++; break;
+            case  ' ': break;
             default: return;
         }
     }

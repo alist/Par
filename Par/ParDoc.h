@@ -5,10 +5,10 @@
 struct ParDoc {
     
     char*_chr;
-    int row;
-    int col;
+    
+    int front; // front of last match;
+    int idx;  // cursor after last match
     int size;
-    int idx;
     int docId;
     
     static int nextDocId;
@@ -17,21 +17,21 @@ struct ParDoc {
         
         docId = nextDocId++;
         _chr = 0;
-        row = 0;
-        col = 0;
         size = 0;
+        front = 0;
     }
 
     ParDoc(char*chr_){
         
         docId = nextDocId++;
         _chr = chr_;
-        row = 0;
-        col = 0;
         idx = 0;
+        front = 0;
         size = (int)strlen(_chr);
 
     }
+    void frontBack(int,int);
+    
     // create substring by forcing a terminating char
     char pushCutHack(int cutIdx) {
  
@@ -52,18 +52,10 @@ struct ParDoc {
         }
     }
     
-    ParDoc(ParDoc&p_, int startIdx, int endIdx) {
-
-        size = endIdx-startIdx;
-        _chr = (char*)malloc(size+1);
-        strncpy(_chr, p_._chr+startIdx,size);
-        _chr[size]='\0';
-        row = 0;
-        col = 0;
-        idx = 0;
+    char *ptr() {
+        return _chr+idx;
     }
-   
-    char*ptr() {return _chr+idx;}
+    
     bool nextWord();
     bool hasMore();
     void operator = (ParDoc&p_);
