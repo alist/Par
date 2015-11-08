@@ -14,7 +14,8 @@ void ParDef::initWithFile(const char*filename) {
         delete (buf);
     }
     else {
-        DebugPrint("*** ParDef::initWithFile(%s) - file not found\n", filename);
+        fprintf(stdout,"*** ParDef::initWithFile(%s) - file not found\n", filename);
+        errors++;
     }
 }
 void ParDef::initWithBuf(const char*buf) {
@@ -28,7 +29,8 @@ void ParDef::initWithBuf(const char*buf) {
         bindGrammar();
     }
     else {
-        DebugPrint("*** ParDef::initWithBuf - null buffer\n");
+         fprintf(stdout,"*** ParDef::initWithBuf - null buffer\n");
+        errors++;
     }
 }
 
@@ -43,7 +45,8 @@ Toks *ParDef::parseFile(const char *filename) {
         return toks;
     }
     else {
-        DebugPrint("*** ParDef::parseFile(%s) - file not found\n", filename);
+        fprintf(stdout,"*** ParDef::parseFile(%s) - file not found\n", filename);
+        errors++;
         return 0;
     }
 }
@@ -240,9 +243,9 @@ inline void ParDef::bindName(Par*par) {
             }
         }
     }
-    else if (name!="?" &&
-             par->matching!=kMatchMeta){
-        DebugPrint("*** ParDef::bindName: '%s' not found\n",name.c_str());
+    else if (name!="?" && par->matching!=kMatchMeta) {
+        errors++;
+        fprintf(stdout,"*** ParDef::bindName: '%s' not found\n",name.c_str());
      }
 }
 
@@ -264,6 +267,7 @@ void ParDef::promoteOnlyChild(Par *par) {
         }
     }
 }
+
 void ParDef::bindParTree(Par*par) {
     
     if (par->memoMe < Par::MemoNow) {
@@ -272,6 +276,11 @@ void ParDef::bindParTree(Par*par) {
         promoteOnlyChild(par);
         bindName(par);
         
+        if (errors>0) {
+            fprintf(stdout, "*** Exiting Par due to %i error%s \n\n",errors,errors>1 ? "s." : ".");
+            exit(-1);
+        }
+
         if (par->parList.size()>0) {
             
             for (Par*par2 : par->parList) {
@@ -281,6 +290,7 @@ void ParDef::bindParTree(Par*par) {
         }
     }
 }
+
 void ParDef::bindGrammar() {
     
     for (int i=0; i<grammar.size(); i++) {

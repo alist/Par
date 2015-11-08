@@ -12,8 +12,9 @@ struct ParDef {
     NamePars namePars;
     ParList grammar;
     ParTok *parTok;
+    int errors;
     
-    ParDef(){}
+    ParDef(){errors=0;}
     void initWithBuf(const char*buf);
     void initWithFile(const char*filename);
     

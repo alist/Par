@@ -20,11 +20,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Par/ParDef.cpp"
-            timestampString = "468599719.591657"
+            timestampString = "468639801.341877"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "171"
-            endingLineNumber = "171"
+            startingLineNumber = "174"
+            endingLineNumber = "174"
             landmarkName = "ParDef::addList(Par*par,Toks*toks,int toki)"
             landmarkType = "5">
          </BreakpointContent>
@@ -79,29 +79,45 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Par/Par.cpp"
-            timestampString = "468614115.408745"
+            filePath = "Par/ParDef.cpp"
+            timestampString = "468640177.435389"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "327"
-            endingLineNumber = "327"
-            landmarkName = "Par::parseWave(Toks*toks, ParDoc &amp;doc, int level)"
+            startingLineNumber = "280"
+            endingLineNumber = "280"
+            landmarkName = "ParDef::bindParTree(Par*par)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Par/ParDef.cpp"
+            timestampString = "468639801.341877"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "248"
+            endingLineNumber = "248"
+            landmarkName = "ParDef::bindName(Par*par)"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Par/Par.cpp"
-            timestampString = "468626267.982022"
+            timestampString = "468642260.007511"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "398"
-            endingLineNumber = "398"
-            landmarkName = "Par::parseMeta(Toks *toks, ParDoc&amp;doc, int level, Par *&amp;meta, Par*par, int count)"
+            startingLineNumber = "344"
+            endingLineNumber = "344"
+            landmarkName = "Par::parseWave(Toks*toks, ParDoc &amp;doc, int level)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

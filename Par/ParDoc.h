@@ -30,25 +30,40 @@ struct ParDoc {
         size = (int)strlen(_chr);
 
     }
+    
     void frontBack(int,int);
     
-    // create substring by forcing a terminating char
-    char pushCutHack(int cutIdx) {
+    /*      *** pushCutHack is NOT THREAD SAFE ***
+     *
+     * hack an in-place substring by overwriting a '\0' at beginning of last match.
+     * The hack char is managed by the caller, which also copies the state, like so:
+     *
+     *      ParDoc cut = doc; // does not copy _chr
+     *      char hack = cut.pushCutHack();
+     *      ... 
+     *      cut.popCutHack(hack);
+     *      doc = cut;
+     *
+     *      *** This is NOT THREAD SAFE ***
+     *      used for recursive parsing where the substrings never overlap
+     */
+    char pushCutHack() {
  
-        if (cutIdx>size-1) {
+        if (front>size-1) {
             return '\0';
         }
         else {
-            char hack =_chr[cutIdx];
-            _chr[cutIdx] = '\0';
+            char hack =_chr[front];
+            _chr[front] = '\0';
             return hack;
         }
     }
-    // restore from substring
-    void popCutHack(int cutIdx,char hack) {
+    /* restore character - see pushCutHack for details
+     */
+    void popCutHack(char hack) {
         
-        if (cutIdx<size) {
-            _chr[cutIdx] = hack;
+        if (front<size) {
+            _chr[front] = hack;
         }
     }
     
@@ -58,7 +73,7 @@ struct ParDoc {
     
     bool nextWord();
     bool hasMore();
-    void operator = (ParDoc&p_);
+    void copyState(ParDoc&p_);
     bool operator == (ParDoc&p_);
     void operator += (int offset);
     int trimSpace(int i);

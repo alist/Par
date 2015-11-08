@@ -1,6 +1,4 @@
-doc (next+)
-next (~sent '[.!?]')
-sent (hello ~mo world ~oy)
-hello (i'^hello')
-world (i'^world')
-more  ('^beautiful'|'^big'|'^world')+
+def (hello ~ world ~ emoji)+
+hello ('^hello')
+world ('^world')
+emoji('^😊|😃|😏|😈')

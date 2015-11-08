@@ -8,8 +8,9 @@ int ParDoc::nextDocId = 1000;
 
 /* this is used for backtracking, so does not own string
  */
-void ParDoc::operator = (ParDoc&p_) {
- 
+
+void ParDoc::copyState(ParDoc&p_) {
+    
     docId = nextDocId++;
     _chr = p_._chr;
     idx  = p_.idx;
@@ -34,15 +35,15 @@ void ParDoc::operator += (int offset) {
 }
 void ParDoc::frontBack(int frontOffset, int backOffset) {
 
-    front = std::min(idx+frontOffset,size-1);
-    idx   = std::min(idx+backOffset,size-1);
+    front = std::min(idx+frontOffset,size);
+    idx   = std::min(idx+backOffset,size);
 }
 
 bool ParDoc::nextWord() {
     
     for (;idx<size; idx++) {
         
-        if (_chr[idx]== ' ') {
+        if (_chr[idx]==' ') {
             
             break;
         }
@@ -80,7 +81,8 @@ void ParDoc::eatWhitespace() {
 
 bool ParDoc::hasMore() {
     
-    if  (idx < size-1) {
+    if  ((_chr[idx]!= '\0') &&
+         (idx < size-1)) {
         return true;
     }
     else {

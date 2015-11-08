@@ -101,8 +101,8 @@ struct Par {
     RetFlag parseAny (Toks*, ParDoc&, int level);
     RetFlag parseOpt (Toks*, ParDoc&, int level);
     
-    void parseMeta2(Toks*, ParDoc&, int level, Par *&meta, int count, int startIdx);
-    RetFlag parseMeta(Toks*, ParDoc&, int level, Par *&meta, Par*par,int prevLevel);
+    void parseMeta2(Toks*, ParDoc&, int level, Par *&meta,int startIdx);
+    RetFlag parseMeta(Toks*, ParDoc&, int level, Par *&meta, Par*par);
     RetFlag parseWave(Toks*, ParDoc&, int level);
     RetFlag parseAnd (Toks*, ParDoc&, int level);
     RetFlag parseOr  (Toks*, ParDoc&, int level);

@@ -3,7 +3,7 @@ Files
 
 Def.def - marcros that bootstrap the Par parser
 Def.par - what the Par looks like defined by itself
-ParTokDef
+
 
 
 
@@ -94,13 +94,11 @@ the beginning with '^' and '$', like so:
     1, 2:  hello : hello
     2, 2:  world : world
 
-To capture everything everthing between, use '~' infront of a name.
-like so:
+To capture everything everthing between, use '~' infront of a name, like so:
 
     def (hello ~middle world)
     hello ('^hello')
     world ('^world')
-
 
     "hello big beautifil world" // will still result in
 
@@ -120,14 +118,13 @@ To make the match case independant, use a preceeding 'i'
     1, 2:  hello : Hello
     2, 2:  world : WORLD
 
-Par does not require a surrounding parens'()' to return the match result.
-However, an inner parens
+Par doesnt require a surrounding parens'()'. But, an inner parens:
 
     def (hello world)+
-    hello ('he(ll)?o')
+    hello ('he(ll)?o') // here
     world ('world')
 
-    "hello world" //  can result a confusing result:
+    "hello world" //  will return a confusing result:
 
     0, 1: def :
     1, 2:  hello : ll
@@ -136,7 +133,7 @@ However, an inner parens
 So, add surrounding parens
 
     def (hello world)+
-    hello ('(he(ll)?o)')
+    hello ('(he(ll)?o)') // here
     world ('world')
 
     "hello world" //  to resolve what value is returned
@@ -148,7 +145,6 @@ So, add surrounding parens
 Par also matches string literals between double quotes "..."
 Which comes in handy for parsing characters that have special Regex meanings
 such as ()[]{}!$^*? .
-
 
     def (hello world paren? emoji?)+
     hello ('hello')
@@ -173,27 +169,26 @@ we could go crazy and combine everything together in a compound statement like, 
 
     "hello beautiful world (yo) 😊" // resulting in a single token
 
-    0, 1: woohoo : 😊 // notice that only the last match is applied to the token woohoo
+     0, 1: woohoo : 😊
 
 RECURSION
 
 Right recursion is allowed; as long as there is preceeding pattern
 that matches one more times
 
-    def (hello def? ~extra world)+
+    def (hello def? ~wild world)+
     hello (i'^hello'|i'(good (morning|afternoon|evening))')
     world (i'^world'|i'^planet'|i'^earth')
 
-    "Hello and a good morning big beautiful planet earth"
+    "Hello good morning big beautiful planet earth"
 
     0, 1: def :
     1, 2:  hello : Hello
     2, 2:  def :
     3, 3:   hello : good morning
-    4, 3:   extra : big
-    5, 3:   extra : beautiful
-    6, 3:   world : planet
-    7, 2:  world : earth
+    4, 3:   ~wild : big beautiful
+    5, 3:   world : planet
+    6, 2:  world : earth
 
 Left recursion will exit the app, so:
 
@@ -202,38 +197,77 @@ Left recursion will exit the app, so:
 
     "hello world " // will result in the following message
 
-    *** def:parse exceeded maximum levels:200 ***
+    *** def:parse exceeded maximum levels: 200 ***
 
 ISLAND PARSING
 
-To search multiple patterns as independant islands, use a wave '~' (tilde)
-to separate patterns to search in parallel. For Example, the following
-def search for 5 regx patterns in parallel:
-
-    def (aloha ~ hello ~ world ~ greet)+
-
+The wave '~' (tilde) searches in parallel. For Example:
+{
+    def (aloha ~ hello ~ world ~ close)
     aloha (i'^aloha')
     hello (i'^hello'|i'^(good (morning|afternoon|evening))')
     world (i'^world'|i'^planet'|i'^earth')
-    greet (i'^yours truly')
-
+    close (i'^yours truly')
+    
     // Given the following input document
     
     "Yo! Good morning big beautiful planet earth - Aloha from yours truly."
-
+    
     // produced the following token stream (#,level: name, value)
-
-    0, 1: ~      : Yo!
+    
+    0, 2:  ~     : Yo!
     1, 2:  hello : Good morning
-    2, 1: ~      : big beautiful
+    2, 2:  ~     : big beautiful
     3, 2:  world : planet
     4, 2:  world : earth
-    5, 1: ~      : -
+    5, 2:  ~     : -
     6, 2:  aloha : Aloha
-    7, 1: ~      : from
-    8, 2:  greet : yours truly
-    9, 1: ~      : .
-
+    7, 2:  ~     : from
+    8, 2:  close : yours truly
+    9, 2:  ~     : .
+}
 The '~' tokens are the unmatched portions from the document -- the water between
 the islands.
+
+Using the '~' can be slow if there are many words between matches, as Par will
+advance word by word, and try all the the patterns until a match is found.
+
+
+
+------------------------------------
+
+sent (words)+
+words (~aaaa hello ~bbbb world ~cccc punct)
+punct ('[.!?]')
+hello (i'^hello')
+world (i'^world')
+more  ('^beautiful'|'^big'|'^world')+
+
+"yo hello big beautiful world. hello world yo."
+
+0, 1: sent :
+1, 2:  words :
+2, 3:   ~aaaa : yo
+3, 3:   hello : hello
+4, 3:   ~bbbb : big beautiful
+5, 3:   world : world
+6, 3:   ? : .
+7, 2:  words :
+8, 3:   hello : hello
+9, 3:   world : world
+10, 3:   ~cccc : yo
+11, 3:   ? : .
+
+------------------------------------
+
+def (hello ~ world ~ emoji)+
+hello ('^hello')
+world ('^world')
+emoji('^😊|😃|😏|😈')
+
+"hello 😊 world"
+
+0, 2:  hello : hello
+1, 2:  emoji : 😊
+2, 2:  world : world
 
