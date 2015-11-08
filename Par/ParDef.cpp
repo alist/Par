@@ -223,8 +223,12 @@ inline void ParDef::bindName(Par*par) {
     
     string &name = par->name;
     Par *pari = namePars[name];
+    if (!pari && name[0]=='~') {
     
-    if (pari) {        // is this not a par?
+        pari = namePars[name.substr(1)];
+    }
+    
+    if (pari) { // is this not a par?
         
         if (par->matching == kMatchMeta) {
             

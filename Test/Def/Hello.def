@@ -1,4 +1,6 @@
-def (hello ~ world ~ emoji)+
-hello ('^hello')
-world ('^world')
+def (hello world paren? emoji?)+
+hello ('hello')
+world ('world')
+paren ('\(' ~yo '\)')
+inside (i'[a-z ]*')
 emoji('^😊|😃|😏|😈')

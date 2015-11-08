@@ -7,22 +7,26 @@ Def.par - what the Par looks like defined by itself
 
 
 
-Par extends PCRE regular expressions with a symbolic toked stream.
+Par extends regular expressions with a symbolic token stream
+that includes a: tokId, level, symbol, and optional value.
 
 For example, the grammar
 
-    def (hello world)
+    yo (hello world)
     hello ('hello')
     world ('world')
 
     "hello world" // will convert this string into the following token stream
 
-    0, 1: def :
+    0, 1: yo :
     1, 2:  hello : hello
     2, 2:  world : world
 
+The top name can be anything, 'yo', 'oy', whatever you want
+
 Par supports alternation '|' and repetition '+','*','?'
-and behaves as expected. So, changing def to:
+
+So, changing def to:
 
     def (hello | world)+
     hello ('hello')
@@ -35,12 +39,15 @@ and behaves as expected. So, changing def to:
     2, 1: def :
     3, 2:  world : world
 
-Par uses PCRE to match everything between the ' ' quotes.
-So, the the regex patterns behave as expected, including:
+Par uses PCRE to match everything between the '...' quotes.
+So, the regex patterns behave as expected, including:
 
-    '^' to match at the beginning
-    '?' as an optional and
-    '$' to match at the end of the line
+    '^' to match at the beginning ('^first')
+    '$' anchor to end of line ('last$')
+
+    '+' one or more
+    '*' zero or more
+    '?' zero or one
 
 So, the grammar:
 
@@ -56,78 +63,98 @@ So, the grammar:
     3, 2:  world : wrld
 
 When Par matches a pattern it advances the document pointer past the match
-to the next non-whitespace character. So, the following grammar
-with 'world' and 'hello' reversed:
+to the next non-whitespace character. Thus, anchoring with '^' is crucial
+For example, swapping the order of world and hello, without an anchor:
 
-    def (world | hello)+
+
+    def (world | hello)+ // will search for 'world' first
     hello ('hello')
     world ('world')
 
-    "hello world" // will match "world" first, advance the doc pointer and miss "hello"
+    "hello world" // skipping hello, resulting in only one match
 
     0, 1: def :
     1, 2:  world : world
 
-To not advance the pointer, use a preceeding 'n' before the single quote, like so
+To fix, anchor with '^'
 
     def (world | hello)+
-    hello (n'hello')
-    world (n'world')
+    hello ('^hello')
+    world ('^world')
 
     "hello world" // which will yield independant def results
 
     0, 1: def :
-    1, 2:  world : world
+    1, 2:  hello : hello
     2, 1: def :
-    3, 2:  hello : hello
+    3, 2:  world : world
 
-Above, 'hello' and 'world' are NOT anchored. Could anchor to
-the beginning with '^' and '$', like so:
+There is also an option to (n' ') to not advance cursor.
 
     def (hello world)
-    hello (n'^hello')
-    world (n'world$')
+    hello (n'^hello') // find hello at beginning without moving cursor
+    world (n'world$')// find world at and without moving cursor
 
-    "hello big beautifil world" // which anchors to beginning and end
+    "hello big beautifil world" // which ignores everytning in between
 
     0, 1: def :
     1, 2:  hello : hello
     2, 2:  world : world
 
-To capture everything everthing between, use '~' infront of a name, like so:
+To capture everything everthing between, use '~name' which acts
+as a lookahead. It will only capture if the following pattern
+matches. So:
 
     def (hello ~middle world)
     hello ('^hello')
     world ('^world')
 
-    "hello big beautifil world" // will still result in
+    "hello big and beautiful world" // will still result in
 
     0, 1: def :
-    1, 2:  world : world
-    2, 1: def :
-    3, 2:  hello : hello
+    1, 2:  hello : hello
+    2, 2:  ~middle : big beautiful
+    3, 2:  world : world
 
-To make the match case independant, use a preceeding 'i'
+Above, '~middle' didnt match subsequent definitions.
+To parse further could define:
+    
+    def (hello ~middle world)
+    hello ('^hello')
+    world ('^world')
+    middle ('big' | 'beautiful')+ // now middle does a subsearch
+    
+    0, 1: def :
+    1, 2:  hello : hello
+    2, 4:    ~middle : big
+    3, 4:    ~middle : beautiful
+    4, 2:  world : world
+
+Have already seen (n'...') to preserve the cursor position.
+Another option is (i'...') to match independant of case:
+
 
     def (hello world)+
     hello (i'hello')
     world (i'world')
 
     "Hello WORLD" // which will match the mixed case string
+
     0, 1: def :
     1, 2:  hello : Hello
     2, 2:  world : WORLD
 
-Par doesnt require a surrounding parens'()'. But, an inner parens:
+Par doesnt require a surrounding parens'(...)'.
+But, is sometimes worthwhile of have an inner set of parens:
 
     def (hello world)+
-    hello ('he(ll)?o') // here
+    hello ('h(el)?lo') // here to match either hello or hlo
     world ('world')
 
     "hello world" //  will return a confusing result:
 
     0, 1: def :
-    1, 2:  hello : ll
+    1, 2:  hello : el
     2, 2:  world : world
 
 So, add surrounding parens
@@ -136,21 +163,21 @@ So, add surrounding parens
     hello ('(he(ll)?o)') // here
     world ('world')
 
-    "hello world" //  to resolve what value is returned
+    "hello world" // to insure that the full input is returned
 
     0, 1: def :
     1, 2:  hello : hello
     2, 2:  world : world
 
 Par also matches string literals between double quotes "..."
-Which comes in handy for parsing characters that have special Regex meanings
+Which comes in handy for parsing special characters that may be less readable as a regex:
 such as ()[]{}!$^*? .
 
     def (hello world paren? emoji?)+
     hello ('hello')
     world ('world')
-    paren ("(" aside ")")
-    aside (i'[a-z ]*')
+    paren ("(" inside ")")
+    inside (i'[a-z ]*')
     emoji('^😊|😃|😏|😈')
 
     "hello world (yo) 😊" // resulting in the following stream
@@ -159,7 +186,7 @@ such as ()[]{}!$^*? .
     1, 2:  hello : hello
     2, 2:  world : world
     3, 2:  paren :
-    4, 3:   aside : yo
+    4, 3:   inside : yo
     5, 2:  emoji : 😊
 
 Notice that 'paren(...)' combined literals and symbols. If the values are not needed,
@@ -190,7 +217,7 @@ that matches one more times
     5, 3:   world : planet
     6, 2:  world : earth
 
-Left recursion will exit the app, so:
+Left recursion will exit the app:
 
     def (def? hello world)  // or
     def (hello* def? world) // for
@@ -202,7 +229,7 @@ Left recursion will exit the app, so:
 ISLAND PARSING
 
 The wave '~' (tilde) searches in parallel. For Example:
-{
+
     def (aloha ~ hello ~ world ~ close)
     aloha (i'^aloha')
     hello (i'^hello'|i'^(good (morning|afternoon|evening))')
@@ -225,13 +252,12 @@ The wave '~' (tilde) searches in parallel. For Example:
     7, 2:  ~     : from
     8, 2:  close : yours truly
     9, 2:  ~     : .
-}
+
 The '~' tokens are the unmatched portions from the document -- the water between
 the islands.
 
 Using the '~' can be slow if there are many words between matches, as Par will
 advance word by word, and try all the the patterns until a match is found.
-
 
 
 ------------------------------------

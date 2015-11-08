@@ -121,7 +121,6 @@ struct ParRegx  {
                 }
                 if (advanceDoc) {
                     doc.frontBack(ovector[0],ovector[1]);
-                    //doc += ovector[1]; // end of total parse
                     doc.eatWhitespace();
                 }
                 size = ovector[1] - ovector[0];
@@ -146,7 +145,6 @@ struct ParRegx  {
                 }
                 if (advanceDoc) {
                     doc.frontBack(ovector[0],ovector[1]);
-                    //doc += ovector[1]; // end of total parse
                     doc.eatWhitespace();
                 }
                 return true;
