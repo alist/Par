@@ -82,7 +82,7 @@ void ParDoc::eatWhitespace() {
 bool ParDoc::hasMore() {
     
     if  ((_chr[idx]!= '\0') &&
-         (idx < size-1)) {
+         (idx < size)) {
         return true;
     }
     else {

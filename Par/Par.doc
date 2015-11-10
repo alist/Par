@@ -1,11 +1,28 @@
 
 Files
 
-Def.def - marcros that bootstrap the Par parser
-Def.par - what the Par looks like defined by itself
+Def.def     - marcros that define the Par parser
+Def.par     - informal description of Par syntax
+ParMacro.h  - convert macros to Par grammar, used only for bootstrap
+ParDef.*    - bootstrap the Par parser from Def.def
 
+Par.*       - main parsing of input document
+ParPar.*    - convert *.def file into grammar
+ParDoc.*    - manage an input document with shared buffer
+ParTok.*    - Token stream
+ParQuo.*    - match a literal string
+ParRegx.*   - match a regex pattern
 
+Tok.*       - token item produced by parse
+TokTypes.h  - types shared by all token items
+TokStack.*  - utility for calling code to manage hierachy
 
+pcre*.*     - Perl-Compatible Regular Expressions
+
+<name>.def  - definition file for a grammar
+<name>.test - test source example for <name>.def
+
+WALKTRHOUGH of syntax -------------------------------------------------
 
 Par extends regular expressions with a symbolic token stream
 that includes a: tokId, level, symbol, and optional value.
@@ -44,7 +61,6 @@ So, the regex patterns behave as expected, including:
 
     '^' to match at the beginning ('^first')
     '$' anchor to end of line ('last$')
-
     '+' one or more
     '*' zero or more
     '?' zero or one
@@ -101,15 +117,14 @@ There is also an option to (n' ') to not advance cursor.
     1, 2:  hello : hello
     2, 2:  world : world
 
-To capture everything everthing between, use '~name' which acts
-as a lookahead. It will only capture if the following pattern
-matches. So:
+To capture everything everthing between, use '~name' which looks ahead
+to see if the following pattern matches. So:
 
     def (hello ~middle world)
     hello ('^hello')
     world ('^world')
 
-    "hello big and beautiful world" // will still result in
+    "hello big and beautiful world" // will result in
 
     0, 1: def :
     1, 2:  hello : hello
@@ -117,7 +132,7 @@ matches. So:
     3, 2:  world : world
 
 Above, '~middle' didnt match subsequent definitions.
-To parse further could define:
+To parse 'middle' could define:
     
     def (hello ~middle world)
     hello ('^hello')
@@ -130,9 +145,7 @@ To parse further could define:
     3, 4:    ~middle : beautiful
     4, 2:  world : world
 
-Have already seen (n'...') to preserve the cursor position.
 Another option is (i'...') to match independant of case:
-
 
     def (hello world)+
     hello (i'hello')
@@ -198,35 +211,34 @@ we could go crazy and combine everything together in a compound statement like, 
 
      0, 1: woohoo : 😊
 
-RECURSION
+RECURSION -------------------------------------------------
 
 Right recursion is allowed; as long as there is preceeding pattern
 that matches one more times
 
-    def (hello def? ~wild world)+
+    def (hello def? world)+
     hello (i'^hello'|i'(good (morning|afternoon|evening))')
     world (i'^world'|i'^planet'|i'^earth')
 
-    "Hello good morning big beautiful planet earth"
+    "Hello good morning planet earth"
 
     0, 1: def :
     1, 2:  hello : Hello
     2, 2:  def :
     3, 3:   hello : good morning
-    4, 3:   ~wild : big beautiful
-    5, 3:   world : planet
-    6, 2:  world : earth
+    4, 3:   world : planet
+    5, 2:  world : earth
 
 Left recursion will exit the app:
 
     def (def? hello world)  // or
     def (hello* def? world) // for
 
-    "hello world " // will result in the following message
+    "hello world" // will result in the following message
 
     *** def:parse exceeded maximum levels: 200 ***
 
-ISLAND PARSING
+ISLAND PARSING -------------------------------------------------
 
 The wave '~' (tilde) searches in parallel. For Example:
 
@@ -242,49 +254,53 @@ The wave '~' (tilde) searches in parallel. For Example:
     
     // produced the following token stream (#,level: name, value)
     
-    0, 2:  ~     : Yo!
+    0, 2:  ~ : Yo!
     1, 2:  hello : Good morning
-    2, 2:  ~     : big beautiful
+    2, 2:  ~ : big beautiful
     3, 2:  world : planet
     4, 2:  world : earth
-    5, 2:  ~     : -
+    5, 2:  ~ : -
     6, 2:  aloha : Aloha
-    7, 2:  ~     : from
+    7, 2:  ~ : from
     8, 2:  close : yours truly
-    9, 2:  ~     : .
+    9, 2:  ~ : .
 
 The '~' tokens are the unmatched portions from the document -- the water between
-the islands.
-
-Using the '~' can be slow if there are many words between matches, as Par will
-advance word by word, and try all the the patterns until a match is found.
+the islands. Par will advance word by word, and try all the the patterns until a
+match is found.
 
 
-------------------------------------
+GOTCHA - LookAhead between literal quotes -------------------------------
 
-sent (words)+
-words (~aaaa hello ~bbbb world ~cccc punct)
-punct ('[.!?]')
-hello (i'^hello')
-world (i'^world')
-more  ('^beautiful'|'^big'|'^world')+
+Literal quotes treat everthing that is not a white space as part of word,
+which is fine for left to right matching like so:
 
-"yo hello big beautiful world. hello world yo."
+    paren ("(" inside ")") // this matches
+    inside (i'[a-z ]*')
 
-0, 1: sent :
-1, 2:  words :
-2, 3:   ~aaaa : yo
-3, 3:   hello : hello
-4, 3:   ~bbbb : big beautiful
-5, 3:   world : world
-6, 3:   ? : .
-7, 2:  words :
-8, 3:   hello : hello
-9, 3:   world : world
-10, 3:   ~cccc : yo
-11, 3:   ? : .
+    "yo" // will produce the input stream:
 
-------------------------------------
+     1, 2:  inside : yo
+
+whereas lookahead between quotes will fail
+
+    paren ("(" ~inside ")") // this doesn't match
+    
+After matching the first "(" the lookahead ")" tries to match 'yo)'
+here is a trace:
+    
+    ⦙(yo)     ⦙   1: paren
+    ⦙yo)      ⦙   2:   0, 1: paren :
+    // no tokens were produced
+
+To fix, use a regex with initial anchor '^(' and unanchored ')'
+    
+    paren ('^\(' ~inside '\)') // producing the token stream
+    
+    0, 1: paren :
+    1, 4:    ~inside : yo
+
+Additional Tests ---------------------------------------------------------
 
 def (hello ~ world ~ emoji)+
 hello ('^hello')
@@ -297,3 +313,7 @@ emoji('^😊|😃|😏|😈')
 1, 2:  emoji : 😊
 2, 2:  world : world
 
+
+
+
+    

@@ -18,13 +18,13 @@ list ("(" (waves | ors | ands | item | list)+ ")" repeat? )
 
   ands (item item+) // two or more items
 
-  item ((named|quote|regx|meta) pred?)
+  item ((named|quote|regx|ahead) pred?)
 
     named (name repeat?)
     quote ('^\\"([^\\"]*)\\"')
     regx  ('^([i]?\\'.*\\')' pred?)
     pred  ('=>\'(\w+)\')
-    meta  ('^[\~]([a-z]+)')
+    ahead  ('^[\~]([a-z]+)')
 
   repeat (any mny opt)
 

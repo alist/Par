@@ -1,7 +1,9 @@
 #import <vector>
 #import <stdlib.h>
 #import <string.h>
-
+/* ParDoc saves state on a shared char* _chr ; many ParDocs may point to the same _chr.
+ *
+ */
 struct ParDoc {
     
     char*_chr;

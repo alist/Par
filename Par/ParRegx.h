@@ -11,7 +11,7 @@
   4) cp /usr/local/lib/libpcre* pcre/lib
  */
 
-//TODO: NFA DFAs https://swtch.com/~rsc/regexp/regexp1.html
+//TODO: NFA vs. DFAs https://swtch.com/~rsc/regexp/regexp1.html
 
 
 #import "pcre.h"
@@ -50,29 +50,39 @@ struct ParRegx  {
         found = false;
         advanceDoc = true;
 
+        /* test for options:
+         * i'... case insensitive match
+         * n'... do not advance cursor to end of match
+         *
+         * not the macro Regx("^([in]*\'[^\']*)\'"))
+         * returns only the initial option letters and leading single quote '
+         */
+        int maxOpt = 2; // maximum number of options
         int pcreOptions = 0;
+        const char *opt = pattern;
+        for (int i=0; i<=maxOpt; i++, opt++) {
+            switch (*opt) {
+                case '\\': // avoid preceeding slash in ('\'...'), so drop thru
+                case '\0': pcreOptions = 0; goto done; // no trailing ' so not an (i'...'), et
+                case '\'': pattern = opt+1; goto done;   // found (i',(n',(ni', etc
+                case 'i': pcreOptions |= PCRE_CASELESS; break;
+                case 'n': advanceDoc = false; break;
+                default: break;
+            }
+        }
+    done:
+        /* compile the pattern */
         
-        for (;*pattern!='\'' && *pattern!= '\0';pattern++) {
-            
-            if (*pattern=='i') {
-                pcreOptions |= PCRE_CASELESS;
-            }
-            else if (*pattern=='n') {
-                advanceDoc = false;
-            }
-        }
-        if (*pattern=='\'') {
-            pattern++;
-        }
-        // compile
         const char*error=0;
         int erroffset=0;
         if (strlen(pattern)>0) {
             re = pcre_compile (pattern, pcreOptions ,&error, &erroffset,0);
         }
         if (error) {
+            
             fprintf(stdout, "\n*** error: %s",error);
             fprintf(stdout, "%s\n",pattern);
+            
             for (int i=0;i<erroffset-1; i++) {
                 fprintf(stdout, " ");
             }

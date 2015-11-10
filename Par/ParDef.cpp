@@ -177,19 +177,12 @@ int ParDef::addList(Par*par,Toks*toks,int toki) {
                 }
                 break;
             }
-            case str2int("meta"): {
+            case str2int("ahead"): {
                 
-                Par *pari = new Par(kMatchMeta);
+                Par *pari = new Par(kMatchAhead);
                 pari->name = *tok->value;
                 par->parList.push_back(pari);
                 toki = addList(pari, toks, toki);
-
-//                ParRegx *rx = new ParRegx("'^\\w+");
-//                Par*pari = new Par(rx);
-//                pari->name = *tok->value;
-//                pari->matching = kMatchMeta;
-//                par->parList.push_back(pari);
-//                
                 break;
             }
                 
@@ -230,7 +223,7 @@ inline void ParDef::bindName(Par*par) {
     
     if (pari) { // is this not a par?
         
-        if (par->matching == kMatchMeta) {
+        if (par->matching == kMatchAhead) {
             
             Par *par2 = new Par(&name);
             bindName(par2);
@@ -247,7 +240,7 @@ inline void ParDef::bindName(Par*par) {
             }
         }
     }
-    else if (name!="?" && par->matching!=kMatchMeta) {
+    else if (name!="?" && par->matching!=kMatchAhead) {
         errors++;
         fprintf(stdout,"*** ParDef::bindName: '%s' not found\n",name.c_str());
      }

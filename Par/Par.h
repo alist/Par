@@ -10,38 +10,35 @@
 #import <stdio.h>
 
 typedef enum {
-    kRepOne,
-    kRepMny,
-    kRepAny,
-    kRepOpt,
+    kRepOne,    // a
+    kRepMny,    // a+
+    kRepAny,    // a*
+    kRepOpt,    // a?
 } RepeatType;
 
-
 typedef enum {
-    kMatchRegx,
-    kMatchQuo,
-    kMatchAnd,
-    kMatchOr,
-    kMatchMeta,
-    kMatchWave,
+    kMatchRegx,  // 'a'
+    kMatchQuo,   // "a"
+    kMatchAnd,   // (a b)
+    kMatchOr,    // (a | b)
+    kMatchAhead, // (~a b)
+    kMatchWave,  // (a ~ b)
 } MatchType;
 
+
+/* The grammar "a (b c)" contains two main parts
+ * name:    "a"
+ * parList: ["b", "c"]
+ */
 struct Par;
 typedef vector<Par*> ParList;
 
-/* some matches succeed without creating a token such as a? and a*, 
- * in which case a preceeding pattern may consume tokens
- * such as b in (a ~b c?), or (a ~b c*) that will consume all the words
- * leading up to end of a line or document.
- * So,
- */
 typedef enum {
     kRetNope  = 1<<0, // zero matches for a a+
     kRetZero  = 1<<1, // zero matches for a? a*
     kRetMatch = 1<<2, // one or more matches for a a+ a? a*
     kRetEnd   = 1<<3  // end of file
 } RetFlag;
-
 
 struct Par {
     
@@ -53,7 +50,7 @@ struct Par {
     
     union {
         ParRegx *regx;
-        ParQuo *quo;
+        ParQuo  *quo;
     } match;
     
     static bool Trace; // trace the parse as it happens
@@ -62,50 +59,62 @@ struct Par {
     static int MaxCountDefault; // max matches for a* or a+
     static int MaxLevelDefault; // max levels deep 
  
-    Par(){init();};
+    /* Used only by ParMacro Par_() to bootstrap the parser */
     
-    Par(RepeatType t){init(t);}
+    Par(){init();};
+    void setName(const char*who_);
+    void init(RepeatType);
+    
+    /* Used while parsing *.def files */
+    
     Par(MatchType t){init(t);}
     Par(string*);
-    Par(Par*par);
     Par(ParQuo*quo) {init(quo);}
     Par(ParRegx*rx) {init(rx);}
     
     void init();
-    void init(RepeatType);
     void init(MatchType);
     void init(ParQuo*quo);
     void init(ParRegx*rx);
     
     void add(Par*n);
 
-    void setName(const char*who_);
-    
     Par& operator = (Par&p_) ;
     Par& operator [](int index);
-    
-    operator float();    
-    operator int();    
-    operator const char*();
-    
+  
     void printLevelIndent(int level);
     void printLevelInputMargin(int level, ParDoc&doc);
     
-    int  pushTok  (Toks*, int level, ParDoc&input);
-    void popTok   (Toks*, int tokenSizeBefore);
+    /* push and pop token stack for backtracking non-matches 
+     */
+    int  pushTok(Toks*, int level, ParDoc&input);
+    void popTok (Toks*, int tokenSizeBefore);
+
+    /* parse[One,Mny,Any,Opt] matches cadinality a a+ a* a?
+     * TODO: combine into parseRange {1,1}, {1,kMax}, {0,kMax}, {0,1}
+     */
+    RetFlag parse   (Toks*, ParDoc&, int level);
+    RetFlag parseOne(Toks*, ParDoc&, int level);
+    RetFlag parseMny(Toks*, ParDoc&, int level);
+    RetFlag parseAny(Toks*, ParDoc&, int level);
+    RetFlag parseOpt(Toks*, ParDoc&, int level);
     
-    RetFlag parse    (Toks*, ParDoc&, int level);
+    /* parseAnd may include parseAhead (a ~b c), which in turn calls parseBehind
+     */
+    void   parseBehind(Toks*, ParDoc&, int level, Par *&behind,int startIdx);
+    RetFlag parseAhead(Toks*, ParDoc&, int level, Par *&behind, Par*par);
+    RetFlag parseAnd  (Toks*, ParDoc&, int level);
     
-    RetFlag parseOne (Toks*, ParDoc&, int level);
-    RetFlag parseMny (Toks*, ParDoc&, int level);
-    RetFlag parseAny (Toks*, ParDoc&, int level);
-    RetFlag parseOpt (Toks*, ParDoc&, int level);
+    /* parseOr may include ParseAnd with ParseAhead (a | b | c d~ e)
+     */
+    RetFlag parseOr   (Toks*, ParDoc&, int level);
     
-    void parseMeta2(Toks*, ParDoc&, int level, Par *&meta,int startIdx);
-    RetFlag parseMeta(Toks*, ParDoc&, int level, Par *&meta, Par*par);
-    RetFlag parseWave(Toks*, ParDoc&, int level);
-    RetFlag parseAnd (Toks*, ParDoc&, int level);
-    RetFlag parseOr  (Toks*, ParDoc&, int level);
+    /* parseWave matches (a ~ b) - does not mix with ParseOr so, 
+     * do NOT mix parseOr (a ~ b | c) or Leafs ('a' ~ "b")
+     */
+    RetFlag parseWave (Toks*, ParDoc&, int level);
+
+    /* One or more Leaf nodes needed to match */
     RetFlag parseQuo (Toks*, ParDoc&, int level);
     RetFlag parseRegx(Toks*, ParDoc&, int level);
 

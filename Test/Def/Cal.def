@@ -107,13 +107,12 @@ days    (i'^(da?ys?)')
 hours   (i'^(h(ou)?rs?)')
 mins    (i'^(minu?t?e?s?)')
 
-weekpos (
-i'^first'  => '1' |
-i'^second' => '2' |
-i'^third'  => '3' |
-i'^fourth' => '4' |
-i'^next'   =>'+1' |
-i'^last'   =>'-1' )
+weekpos (i'^first'  => '1' |
+         i'^second' => '2' |
+         i'^third'  => '3' |
+         i'^fourth' => '4' |
+         i'^next'   =>'+1' |
+         i'^last'   =>'-1' )
 
 interval (every)
 ending   (until)

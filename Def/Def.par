@@ -1,40 +1,30 @@
-/* Bootstrap the grammar parser - see ParMacro for details
+/* Used by ParDef.cpp to Bootstrap the grammar parser - see ParMacro.h for details
  *
- *  preceeding ' in a Regex quotes, such as:
+ * notice that the macro: Def_(regx ,Regx("^([in]*\'[^\']*)\'"))
+ * returns and optional option letter, opening ', but not closing '
  *
- *       Def_(whatever, Regx("'whatever")) 
- *
- * is a cheat that allows for an optional (i'regexstring'),
- * adds the option PCRE_CASELESS, for example, in Cal.def
- *
-        first (i'^first')
- * 
- * adds PCRE_CASELESS to  pcreOptions
- *
- * It looks strange, here in Def.par, to not have a closing ', but it
- * faster to skip the extra step of the nulling out of the trailing '.
- *
- * TODO:get rid of Def.par and use Def.def, instead.
+ * which allows for a .def add a regex expression like
+ *  first (i'^first') // to add PCRE_CASELESS to  pcreOptions
+ *  last  (n'last$')  // to not advanceDoc after match
  */
 
 Def_(def     ,Mny(One(par),One(list)))
 Def_(par     ,One(name))
 Def_(list    ,And(Quo("("),Mny(Or(One(waves),One(ors),One(ands),One(item),One(list))),Quo(")"),Opt(repeat)))
 Def_(waves   ,And(One(item),Mny(And(One(wave),One(item)))))
-Def_(wave    ,Regx("'^([\\~])[^A-Za-z0-9_]"))
-Def_(orandits,Or(One(ors),One(ands),One(item)))
+Def_(wave    ,Regx("^([\\~][^A-Za-z0-9_])"))
 Def_(ors     ,And(One(andits),Mny(Quo("|"),One(andits))))
 Def_(andits  ,Or(One(ands),One(item)))
 Def_(ands    ,And(One(item),Mny(item)))
-Def_(item    ,And(Or(One(regx),One(quote),One(named),One(meta)),Opt(pred)))
+Def_(item    ,And(Or(One(regx),One(quote),One(named),One(ahead)),Opt(pred)))
 Def_(named   ,And(One(name),Opt(repeat)))
-Def_(quote   ,Regx("'^\"([^\"]*)\""))
-Def_(regx    ,Regx("'^([in]*\'[^\']*)\'"))
-Def_(pred    ,Regx("'^[ ]*[=][>][ ]*[']([^']*)[ ]*[']"))
-Def_(meta    ,Regx("'^([\\~][a-z_][a-z0-9_]*)"))
+Def_(quote   ,Regx("^\"([^\"]*)\""))        // return "anything in between"
+Def_(regx    ,Regx("^([in]*\'[^\']*)\'"))   // return option, opening ', but not closing '
+Def_(pred    ,Regx("^[ ]*[=][>][ ]*[']([^']*)[ ]*[']"))
+Def_(ahead   ,Regx("^([\\~][a-z_][a-z0-9_]*)"))
 Def_(repeat  ,Or(One(any),One(mny),One(opt)))
 Def_(any     ,Quo("*"))
 Def_(mny     ,Quo("+"))
 Def_(opt     ,Quo("?"))
-Def_(name    ,Regx("'^([A-Za-z_][A-Za-z0-9_]*)"))
-Def_(cmt     ,Regx("'^[/][/][ ]*(.*?)[\r\n]+|^[ \r\n\t]+"))
+Def_(name    ,Regx("^([A-Za-z_][A-Za-z0-9_]*)"))
+Def_(cmt     ,Regx("^[/][/][ ]*(.*?)[\r\n]+|^[ \r\n\t]+"))
