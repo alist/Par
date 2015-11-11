@@ -33,20 +33,13 @@ typedef enum {
 struct Par;
 typedef vector<Par*> ParList;
 
-typedef enum {
-    kRetNope  = 1<<0, // zero matches for a a+
-    kRetZero  = 1<<1, // zero matches for a? a*
-    kRetMatch = 1<<2, // one or more matches for a a+ a? a*
-    kRetEnd   = 1<<3  // end of file
-} RetFlag;
-
 struct Par {
     
     string name;
-    RepeatType repeat;
     MatchType matching;
     ParList parList;
     int maxCount;
+    int minCount;
     
     union {
         ParRegx *regx;
@@ -77,6 +70,8 @@ struct Par {
     void init(ParQuo*quo);
     void init(ParRegx*rx);
     
+    void setMinMax(int,int);
+    
     void add(Par*n);
 
     Par& operator = (Par&p_) ;
@@ -90,33 +85,28 @@ struct Par {
     int  pushTok(Toks*, int level, ParDoc&input);
     void popTok (Toks*, int tokenSizeBefore);
 
-    /* parse[One,Mny,Any,Opt] matches cadinality a a+ a* a?
-     * TODO: combine into parseRange {1,1}, {1,kMax}, {0,kMax}, {0,1}
+    /* parse a a+ a* a?
      */
-    RetFlag parse   (Toks*, ParDoc&, int level);
-    RetFlag parseOne(Toks*, ParDoc&, int level);
-    RetFlag parseMny(Toks*, ParDoc&, int level);
-    RetFlag parseAny(Toks*, ParDoc&, int level);
-    RetFlag parseOpt(Toks*, ParDoc&, int level);
+    bool parse   (Toks*, ParDoc&, int level);
     
     /* parseAnd may include parseAhead (a ~b c), which in turn calls parseBehind
      */
-    void   parseBehind(Toks*, ParDoc&, int level, Par *&behind,int startIdx);
-    RetFlag parseAhead(Toks*, ParDoc&, int level, Par *&behind, Par*par);
-    RetFlag parseAnd  (Toks*, ParDoc&, int level);
+    void parseBehind(Toks*, ParDoc&, int level, Par *&before, int &befIdx, int startIdx, int endIdx);
+    bool parseAhead (Toks*, ParDoc&, int level, Par *&before, int &befIdx, Par*par);
+    bool parseAnd   (Toks*, ParDoc&, int level);
     
     /* parseOr may include ParseAnd with ParseAhead (a | b | c d~ e)
      */
-    RetFlag parseOr   (Toks*, ParDoc&, int level);
+    bool parseOr   (Toks*, ParDoc&, int level);
     
     /* parseWave matches (a ~ b) - does not mix with ParseOr so, 
      * do NOT mix parseOr (a ~ b | c) or Leafs ('a' ~ "b")
      */
-    RetFlag parseWave (Toks*, ParDoc&, int level);
+    bool parseWave (Toks*, ParDoc&, int level);
 
     /* One or more Leaf nodes needed to match */
-    RetFlag parseQuo (Toks*, ParDoc&, int level);
-    RetFlag parseRegx(Toks*, ParDoc&, int level);
+    bool parseQuo (Toks*, ParDoc&, int level);
+    bool parseRegx(Toks*, ParDoc&, int level);
 
     void parseBufToFile (const char*buf, const char*traceFile, bool openStderr);
     void parseFileToFile (const char*inputFile, const char*tracefile);

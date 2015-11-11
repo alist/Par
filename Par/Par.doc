@@ -41,7 +41,13 @@ For example, the grammar
 
 The top name can be anything, 'yo', 'oy', whatever you want
 
-Par supports alternation '|' and repetition '+','*','?'
+Par supports alternation '|' and quantifiers:
+    '+ {1,} ' // 1 or more
+    '* {0,} ' // 0 or more
+    '? {0,1}' // zero or 1
+    '  {2}  ' // exactly 2
+    '  {2,3}' // 2 or 3
+    '  {,3} ' // up to 3
 
 So, changing def to:
 
@@ -61,9 +67,7 @@ So, the regex patterns behave as expected, including:
 
     '^' to match at the beginning ('^first')
     '$' anchor to end of line ('last$')
-    '+' one or more
-    '*' zero or more
-    '?' zero or one
+    plus all of the standard quantifiers *+?{}
 
 So, the grammar:
 
@@ -132,7 +136,7 @@ to see if the following pattern matches. So:
     3, 2:  world : world
 
 Above, '~middle' didnt match subsequent definitions.
-To parse 'middle' could define:
+To add a subsearch, define a 'middle':
     
     def (hello ~middle world)
     hello ('^hello')
@@ -300,20 +304,45 @@ To fix, use a regex with initial anchor '^(' and unanchored ')'
     0, 1: paren :
     1, 4:    ~inside : yo
 
-Additional Tests ---------------------------------------------------------
+DEF ------------------------
 
 def (hello ~ world ~ emoji)+
 hello ('^hello')
 world ('^world')
 emoji('^😊|😃|😏|😈')
 
-"hello 😊 world"
+IN ------------------------
+
+hello 😊 world
+
+OUT ---------------------
 
 0, 2:  hello : hello
 1, 2:  emoji : 😊
 2, 2:  world : world
 
+DEF ------------------------
+
+def (a b{2,3} c)
+a('^a')
+b('^b')
+c('^c')
+
+IN ------------------------
+
+a bbb c
+
+OUT -----------------------
+
+0, 1: def :
+1, 2:  a : a
+2, 2:  b : b
+3, 2:  b : b
+4, 2:  b : b
+5, 2:  c : c
+
+DONE -----------------------
 
 
 
-    
+

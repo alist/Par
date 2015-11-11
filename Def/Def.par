@@ -1,13 +1,4 @@
-/* Used by ParDef.cpp to Bootstrap the grammar parser - see ParMacro.h for details
- *
- * notice that the macro: Def_(regx ,Regx("^([in]*\'[^\']*)\'"))
- * returns and optional option letter, opening ', but not closing '
- *
- * which allows for a .def add a regex expression like
- *  first (i'^first') // to add PCRE_CASELESS to  pcreOptions
- *  last  (n'last$')  // to not advanceDoc after match
- */
-
+/* Used by ParDef.cpp to Bootstrap the grammar parser - see ParMacro.h for details */
 Def_(def     ,Mny(One(par),One(list)))
 Def_(par     ,One(name))
 Def_(list    ,And(Quo("("),Mny(Or(One(waves),One(ors),One(ands),One(item),One(list))),Quo(")"),Opt(repeat)))
@@ -22,9 +13,14 @@ Def_(quote   ,Regx("^\"([^\"]*)\""))        // return "anything in between"
 Def_(regx    ,Regx("^([in]*\'[^\']*)\'"))   // return option, opening ', but not closing '
 Def_(pred    ,Regx("^[ ]*[=][>][ ]*[']([^']*)[ ]*[']"))
 Def_(ahead   ,Regx("^([\\~][a-z_][a-z0-9_]*)"))
-Def_(repeat  ,Or(One(any),One(mny),One(opt)))
+Def_(repeat  ,Or(One(any),One(mny),One(opt),One(quant)))
 Def_(any     ,Quo("*"))
 Def_(mny     ,Quo("+"))
 Def_(opt     ,Quo("?"))
+Def_(quant   ,And(Quo("{"),Or(And(One(min),One(comma),Opt(max)),And(One(comma),One(max)),One(exact)),Quo("}")))
+Def_(min     ,Regx("^[0-9]+"))
+Def_(max     ,Regx("^[0]?[0-9]+")) // non-zero number
+Def_(exact   ,Regx("^[0]?[0-9]+"))
+Def_(comma   ,Quo(","))
 Def_(name    ,Regx("^([A-Za-z_][A-Za-z0-9_]*)"))
 Def_(cmt     ,Regx("^[/][/][ ]*(.*?)[\r\n]+|^[ \r\n\t]+"))

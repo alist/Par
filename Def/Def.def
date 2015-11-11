@@ -24,14 +24,19 @@ list ("(" (waves | ors | ands | item | list)+ ")" repeat? )
     quote ('^\\"([^\\"]*)\\"')
     regx  ('^([i]?\\'.*\\')' pred?)
     pred  ('=>\'(\w+)\')
-    ahead  ('^[\~]([a-z]+)')
+    ahead ('^[\~]([a-z]+)')
 
-  repeat (any mny opt)
+  repeat (any mny opt quant)
 
     any ("*") // 0 to n
     mny ("+") // 1 to n
     opt ("?") // 0 or 1
-
+           
+    quant ("{" ((min comma max?) | (comma max) | exact) "}")
+    min('^[0-9]+')
+    max('^[0]?[0-9]+')
+    exact('^[0]?[0-9]+')
+           
 name ('^([A-Za-z_]([A-Za-z0-9_])+)' )
 
 cmt  ('^[/][/][ ]*(.*?)[\r\n]+|^[ \r\n\t]+')

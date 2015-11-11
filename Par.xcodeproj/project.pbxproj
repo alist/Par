@@ -7,16 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8043C2471BD93DC700491914 /* ParTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8033C9211BCD6370004E43BE /* ParTest.cpp */; settings = {ASSET_TAGS = (); }; };
-		808E6FD01BCAD06800A16083 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 808E6FCF1BCACF6200A16083 /* main.cpp */; settings = {ASSET_TAGS = (); }; };
-		809A03421BCD9D910021CA94 /* libpcre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 809A033F1BCD9D910021CA94 /* libpcre.a */; settings = {ASSET_TAGS = (); }; };
-		80B3675D1BC3039100DF8F89 /* ParDoc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80B367421BC302DF00DF8F89 /* ParDoc.cpp */; settings = {ASSET_TAGS = (); }; };
-		80C4809B1BD1AB540067ABDA /* ParTokDef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80C480981BD1AB540067ABDA /* ParTokDef.cpp */; settings = {ASSET_TAGS = (); }; };
-		80C480B41BD1AD090067ABDA /* ParTok.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80C480B21BD1AD090067ABDA /* ParTok.cpp */; settings = {ASSET_TAGS = (); }; };
-		80C480BB1BD1AD310067ABDA /* Tok.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80C480B61BD1AD150067ABDA /* Tok.cpp */; settings = {ASSET_TAGS = (); }; };
-		80C480BC1BD1AD3F0067ABDA /* TokStack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80C480B91BD1AD150067ABDA /* TokStack.cpp */; settings = {ASSET_TAGS = (); }; };
-		80C4EA401BDD77B900F68BDA /* ParDef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80C4EA3E1BDD77B900F68BDA /* ParDef.cpp */; settings = {ASSET_TAGS = (); }; };
-		80EC01B41BC966CB00B3D2C8 /* Par.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80EC01B21BC966CB00B3D2C8 /* Par.cpp */; settings = {ASSET_TAGS = (); }; };
+		8043C2471BD93DC700491914 /* ParTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8033C9211BCD6370004E43BE /* ParTest.cpp */; };
+		808E6FD01BCAD06800A16083 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 808E6FCF1BCACF6200A16083 /* main.cpp */; };
+		809A03421BCD9D910021CA94 /* libpcre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 809A033F1BCD9D910021CA94 /* libpcre.a */; };
+		80B3675D1BC3039100DF8F89 /* ParDoc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80B367421BC302DF00DF8F89 /* ParDoc.cpp */; };
+		80C4809B1BD1AB540067ABDA /* ParTokDef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80C480981BD1AB540067ABDA /* ParTokDef.cpp */; };
+		80C480B41BD1AD090067ABDA /* ParTok.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80C480B21BD1AD090067ABDA /* ParTok.cpp */; };
+		80C480BB1BD1AD310067ABDA /* Tok.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80C480B61BD1AD150067ABDA /* Tok.cpp */; };
+		80C480BC1BD1AD3F0067ABDA /* TokStack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80C480B91BD1AD150067ABDA /* TokStack.cpp */; };
+		80C4EA401BDD77B900F68BDA /* ParDef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80C4EA3E1BDD77B900F68BDA /* ParDef.cpp */; };
+		80EC01B41BC966CB00B3D2C8 /* Par.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80EC01B21BC966CB00B3D2C8 /* Par.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -35,6 +35,8 @@
 		8033C9211BCD6370004E43BE /* ParTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = ParTest.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		8033C9221BCD6370004E43BE /* ParTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParTest.h; sourceTree = "<group>"; };
 		804B9CFC1BE7F21C0063250D /* Par.doc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; name = Par.doc; path = Par/Par.doc; sourceTree = "<group>"; };
+		804D0E261BF38DF9004603EF /* ParTest.test */ = {isa = PBXFileReference; lastKnownFileType = text; path = ParTest.test; sourceTree = "<group>"; };
+		804D0E271BF38DF9004603EF /* ParTest.def */ = {isa = PBXFileReference; lastKnownFileType = text; path = ParTest.def; sourceTree = "<group>"; };
 		804DAA331BD140E100B9DDD3 /* Scratch.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Scratch.h; sourceTree = "<group>"; };
 		808E6FCF1BCACF6200A16083 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		808E6FD31BCAD0C100A16083 /* DebugPrint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DebugPrint.h; sourceTree = "<group>"; };
@@ -204,6 +206,8 @@
 				80C481011BD5761D0067ABDA /* Cal.test */,
 				80C480C01BD1ADF80067ABDA /* Hello.def */,
 				80C480C11BD1ADF80067ABDA /* Hello.test */,
+				804D0E261BF38DF9004603EF /* ParTest.test */,
+				804D0E271BF38DF9004603EF /* ParTest.def */,
 			);
 			path = Def;
 			sourceTree = "<group>";

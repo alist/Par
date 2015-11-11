@@ -168,6 +168,7 @@ int ParDef::addList(Par*par,Toks*toks,int toki) {
                 par->parList.push_back(pari);
                 break;
             }
+                
             case str2int("pred"): {
                 
                 Par*pari = par->parList.back();
@@ -177,6 +178,7 @@ int ParDef::addList(Par*par,Toks*toks,int toki) {
                 }
                 break;
             }
+                
             case str2int("ahead"): {
                 
                 Par *pari = new Par(kMatchAhead);
@@ -185,24 +187,43 @@ int ParDef::addList(Par*par,Toks*toks,int toki) {
                 toki = addList(pari, toks, toki);
                 break;
             }
+            case str2int("exact"): {
                 
+                int num = atoi(tok->value->c_str());
+                Par *pari = par->parList.back();
+                pari->setMinMax(num,num);
+                break;
+            }
+            case str2int("min"): {
+                
+                int num = atoi(tok->value->c_str());
+                Par *pari = par->parList.back();
+                pari->setMinMax(num,-1); // default to infinit
+                break;
+            }
+            case str2int("max"): {
+                
+                int num = atoi(tok->value->c_str());
+                Par *pari = par->parList.back();
+                pari->maxCount = num;
+                break;
+            }
             case str2int("opt"): {
                 
                 Par *pari = par->parList.back();
-                pari->repeat= kRepOpt;
+                pari->setMinMax(0,1);
                 break;
             }
-                
             case str2int("any"): {
                 
                 Par *pari = par->parList.back();
-                pari->repeat = kRepAny;
+                pari->setMinMax(0,-1);
                 break;
             }
             case str2int("mny"): {
                 
                 Par *pari = par->parList.back();
-                pari->repeat = kRepMny;
+                pari->setMinMax(1,-1);
                 break;
             }
         }
@@ -235,8 +256,10 @@ inline void ParDef::bindName(Par*par) {
             par->match    = pari->match;
             par->matching = pari->matching;
             
-            if (par->repeat==kRepOne) { ///???
-                par->repeat = pari->repeat;
+            //TODO: what is this???
+            if (par->minCount==1 && par->maxCount==1) { ///???
+                par->minCount = pari->minCount;
+                par->maxCount = pari->maxCount;
             }
         }
     }
@@ -255,8 +278,11 @@ void ParDef::promoteOnlyChild(Par *par) {
         Par *par2 = par->parList.back();
         
         if (par2->name=="?") {
-            if (par->repeat==kRepOne) {
-                par->repeat = par2->repeat;
+            
+            //TODO: what is this???
+            if (par->minCount==1 && par->maxCount==1) { ///???
+                par->minCount = par2->minCount;
+                par->maxCount = par2->maxCount;
             }
             par->matching = par2->matching;
             par->match    = par2->match;
