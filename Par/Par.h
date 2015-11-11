@@ -89,10 +89,10 @@ struct Par {
      */
     bool parse   (Toks*, ParDoc&, int level);
     
-    /* parseAnd may include parseAhead (a ~b c), which in turn calls parseBehind
+    /* parseAnd may include parseAhead (a ~b c), which in turn calls parseBefore
      */
-    void parseBehind(Toks*, ParDoc&, int level, Par *&before, int &befIdx, int startIdx, int endIdx);
-    bool parseAhead (Toks*, ParDoc&, int level, Par *&before, int &befIdx, Par*par);
+    void parseBefore(Toks*, ParDoc&, int level, Par *&before, int startIdx, int endIdx);
+    bool parseAhead (Toks*, ParDoc&, int level, Par *&before, Par*par);
     bool parseAnd   (Toks*, ParDoc&, int level);
     
     /* parseOr may include ParseAnd with ParseAhead (a | b | c d~ e)

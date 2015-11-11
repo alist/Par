@@ -172,50 +172,41 @@ bool Par::parse(Toks*toks, ParDoc &doc, int level) {
 
 /* After matching c, match b in (a ~b c)
  */
-inline void Par::parseBehind(Toks *toks, ParDoc&doc, int level, Par *&before, int &befIdx, int startIdx, int endIdx) {
+inline void Par::parseBefore(Toks *toks, ParDoc&doc, int level, Par *&before, int startIdx, int endIdx) {
     
     if (startIdx < doc.front) {
         
         endIdx = doc.trimSpace(endIdx);
        
-        Tok *prevTok = toks->back();
-        if (prevTok->level==level) {
-             toks->pop_back();
-        }
-        if (before->parList.size()) {
+         if (before->parList.size()) {
             
             // overwrite a temporary '\0' to parse substring
-            ParDoc cut; cut.copyState(doc);
+            ParDoc cut(doc);
             char hack = doc.pushCutHack();
             doc.idx = startIdx;
             
             for (Par*beforei : before->parList) {
-                beforei->parse(toks, doc, level+1);
+                beforei->parse(toks, doc, level);
             }
             // reinstate full string from '\0'
             cut.popCutHack(hack);
-            doc.copyState(cut);
+            doc = cut;
         }
         else {
             
             Tok*unmatched = new Tok(before->name,doc._chr,startIdx,endIdx,level);
             toks->push_back(unmatched);
         }
-        if (prevTok->level==level) {
-            
-            toks->push_back(prevTok);
-        }
     }
 }
 /* match a,c in (a c), (a ~b c), ...
  */
-inline bool Par::parseAhead(Toks *toks, ParDoc&doc, int level, Par *&before, int &befIdx, Par*par) {
+inline bool Par::parseAhead(Toks *toks, ParDoc&doc, int level, Par *&before, Par*par) {
     
     // for b in '(a ~b c)'
     if (par->matching==kMatchAhead) {
         
         before = par;
-        befIdx = (int)toks->size();
         
         // for b in (a ~b)
         if (before==parList.back() && doc.hasMore()) {
@@ -232,18 +223,28 @@ inline bool Par::parseAhead(Toks *toks, ParDoc&doc, int level, Par *&before, int
         
         return par->parse(toks, doc,level);
     }
-    // for c in  (a ~b c?), were before==b
+    // for c in  (a ~b c?), where before==b
     else {
         
         int startIdx = doc.idx;
-
+        
         while (doc.hasMore()) {
-            
+        
             int endIdx = startIdx;
             
             if (par->parse(toks, doc, level)) {
                 
-                parseBehind(toks, doc, level+1, before, befIdx, startIdx, endIdx);
+                // detach new after tokens from toks
+                Toks after;
+                auto befi = std::next(toks->begin(), tokBefi);
+                after.insert(after.end(),befi, toks->end());
+                toks->resize(tokBefi);
+                
+                // insert before tokens
+                parseBefore(toks, doc, level, before, startIdx, endIdx);
+                
+                // add back the new tokens
+                toks->insert(end(*toks), begin(after), end(after));
                 return true;
             }
             else if (doc.nextWord()) {
@@ -262,17 +263,16 @@ inline bool Par::parseAhead(Toks *toks, ParDoc&doc, int level, Par *&before, int
 bool Par::parseAnd(Toks*toks, ParDoc &doc, int level) {
     
     // push doc and toks
-    ParDoc prev; prev.copyState(doc);
+    ParDoc prev(doc);
     int priorTokIdx = pushTok(toks,level,doc);
     
     Par *before = 0;
-    int befIdx;
     
     for (Par *par : parList) {
         
-        if (!parseAhead(toks,doc,level,before,befIdx,par)) {
+        if (!parseAhead(toks,doc,level,before,par)) {
             
-            doc.copyState(prev);        // pop doc
+            doc = prev;        // pop doc
             popTok(toks,priorTokIdx);   // pop toks
             
             return false;
@@ -286,7 +286,7 @@ bool Par::parseAnd(Toks*toks, ParDoc &doc, int level) {
 bool Par::parseOr(Toks*toks, ParDoc &doc, int level) {
     
     // push doc and toks
-    ParDoc prev; prev.copyState(doc);
+    ParDoc prev(doc);
     int priorTokIdx = pushTok(toks,level,doc);
     
     for (Par *par : parList) {
@@ -295,7 +295,7 @@ bool Par::parseOr(Toks*toks, ParDoc &doc, int level) {
             return true;
         }
     }
-    doc.copyState(prev);        // pop doc
+    doc = prev;        // pop doc
     popTok(toks,priorTokIdx);   // pop toks
     
     return false;

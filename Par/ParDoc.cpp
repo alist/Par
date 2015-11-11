@@ -8,16 +8,6 @@ int ParDoc::nextDocId = 1000;
 
 /* this is used for backtracking, so does not own string
  */
-
-void ParDoc::copyState(ParDoc&p_) {
-    
-    docId = nextDocId++;
-    _chr = p_._chr;
-    idx  = p_.idx;
-    size = p_.size;
-    front = p_.front;
-}
-
 bool ParDoc::operator == (ParDoc&p_) {
     
     if (idx == p_.idx) {
@@ -49,8 +39,9 @@ bool ParDoc::nextWord() {
         }
     }
     eatWhitespace();
-    return (idx <size);
+    return (idx < size);
 }
+
 int ParDoc::trimSpace(int i) {
     
     for (;i>0; i--) {

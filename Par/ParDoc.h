@@ -32,6 +32,28 @@ struct ParDoc {
         size = (int)strlen(_chr);
 
     }
+    ParDoc(ParDoc&p_) {
+     
+        docId = nextDocId++;
+        _chr = p_._chr;
+        idx  = p_.idx;
+        size = p_.size;
+        front = p_.front;
+
+    }
+    ParDoc& operator =(ParDoc&p_)  {
+        
+        _chr = p_._chr;
+        idx  = p_.idx;
+        size = p_.size;
+        front = p_.front;
+        return *this;
+    }
+    
+
+    bool operator == (ParDoc&p_);
+    void operator += (int offset);
+    
     
     void frontBack(int,int);
     
@@ -75,9 +97,6 @@ struct ParDoc {
     
     bool nextWord();
     bool hasMore();
-    void copyState(ParDoc&p_);
-    bool operator == (ParDoc&p_);
-    void operator += (int offset);
     int trimSpace(int i);
     void eatWhitespace();
 };
