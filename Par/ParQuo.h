@@ -26,7 +26,7 @@ struct ParQuo {
     virtual bool parse(ParDoc &doc) {
         
         if (strncmp(doc.ptr(),pattern,size)==0) {
-            doc.frontBack(0,size);
+            doc += size;
             doc.eatWhitespace();
             return true;
         }

@@ -16,7 +16,7 @@ Tok::Tok (string &name, const char*charp, int level_) {
 Tok::Tok(string &name, const char*charp, int startIdx, int endIdx, int level_) {
 
     setTokType(name);
-    value = new string (charp+startIdx,charp+endIdx);
+    value = new string(charp+startIdx,endIdx-startIdx+1);
     level = level_;
 }
 

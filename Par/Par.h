@@ -52,16 +52,16 @@ struct Par {
     static int MaxCountDefault; // max matches for a* or a+
     static int MaxLevelDefault; // max levels deep 
  
-    /* Used only by ParMacro Par_() to bootstrap the parser */
-    
+    /* Used only by ParMacro Par_() to bootstrap the parser 
+     */
     Par(){init();};
     void setName(const char*who_);
     void init(RepeatType);
     
-    /* Used while parsing *.def files */
-    
+    /* Used while parsing *.def files 
+     */
     Par(MatchType t){init(t);}
-    Par(string*);
+    Par(string*n)   {init(); name = *n; }
     Par(ParQuo*quo) {init(quo);}
     Par(ParRegx*rx) {init(rx);}
     
@@ -87,27 +87,25 @@ struct Par {
 
     /* parse a a+ a* a?
      */
-    bool parse   (Toks*, ParDoc&, int level);
+    bool parseStart(Toks*, ParDoc&);
+    bool parse(Toks*, ParDoc&, int level, Par *&before);
     
     /* parseAnd may include parseAhead (a ~b c), which in turn calls parseBefore
      */
     void parseBefore(Toks*, ParDoc&, int level, Par *&before, int startIdx, int endIdx);
     bool parseAhead (Toks*, ParDoc&, int level, Par *&before, Par*par);
-    bool parseAnd   (Toks*, ParDoc&, int level);
+    bool parseAnd   (Toks*, ParDoc&, int level, Par *&before);
     
     /* parseOr may include ParseAnd with ParseAhead (a | b | c d~ e)
      */
-    bool parseOr   (Toks*, ParDoc&, int level);
+    bool parseOr   (Toks*, ParDoc&, int level, Par *&before);
     
     /* parseWave matches (a ~ b) - does not mix with ParseOr so, 
      * do NOT mix parseOr (a ~ b | c) or Leafs ('a' ~ "b")
      */
-    bool parseWave (Toks*, ParDoc&, int level);
+    bool parseWave (Toks*, ParDoc&, int level, Par *&before);
 
     /* One or more Leaf nodes needed to match */
     bool parseQuo (Toks*, ParDoc&, int level);
     bool parseRegx(Toks*, ParDoc&, int level);
-
-    void parseBufToFile (const char*buf, const char*traceFile, bool openStderr);
-    void parseFileToFile (const char*inputFile, const char*tracefile);
   };

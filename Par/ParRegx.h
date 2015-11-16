@@ -130,7 +130,7 @@ struct ParRegx  {
                      result.assign(doc.ptr() + ovector[2], size);
                 }
                 if (advanceDoc) {
-                    doc.frontBack(ovector[0],ovector[1]);
+                    doc += ovector[1];
                     doc.eatWhitespace();
                 }
                 size = ovector[1] - ovector[0];
@@ -154,7 +154,7 @@ struct ParRegx  {
                     result.assign(doc.ptr() + ovector[0], size);
                 }
                 if (advanceDoc) {
-                    doc.frontBack(ovector[0],ovector[1]);
+                    doc+= ovector[1];
                     doc.eatWhitespace();
                 }
                 return true;

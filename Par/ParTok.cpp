@@ -1,6 +1,7 @@
 #import "ParTok.h"
 #import "Tok.h"
 #include <assert.h>
+
 #import "DebugPrint.h"
 #define PrintParTok(...) DebugPrint(__VA_ARGS__)
 
@@ -47,7 +48,7 @@ Toks *ParTok::buf2tok(const char *buf, bool trace, bool print) {
     initNameHash(root);
     
     ParDoc doc((char*)buf);
-    root->parse(tokens,doc,0);
+    root->parseStart(tokens,doc);
     if (print) {
         printToks();
     }

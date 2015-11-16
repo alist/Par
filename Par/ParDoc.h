@@ -8,7 +8,7 @@ struct ParDoc {
     
     char*_chr;
     
-    int front; // front of last match;
+    //int front; // front of last match;
     int idx;  // cursor after last match
     int size;
     int docId;
@@ -20,7 +20,6 @@ struct ParDoc {
         docId = nextDocId++;
         _chr = 0;
         size = 0;
-        front = 0;
     }
 
     ParDoc(char*chr_){
@@ -28,36 +27,32 @@ struct ParDoc {
         docId = nextDocId++;
         _chr = chr_;
         idx = 0;
-        front = 0;
         size = (int)strlen(_chr);
 
     }
+    
     ParDoc(ParDoc&p_) {
      
         docId = nextDocId++;
         _chr = p_._chr;
         idx  = p_.idx;
         size = p_.size;
-        front = p_.front;
-
     }
-    ParDoc& operator =(ParDoc&p_)  {
+    
+    ParDoc& operator = (ParDoc&p_)  {
         
         _chr = p_._chr;
         idx  = p_.idx;
         size = p_.size;
-        front = p_.front;
         return *this;
     }
     
+     void operator += (int offset) {
+         idx = std::min(idx+offset,size);
+    }
 
-    bool operator == (ParDoc&p_);
-    void operator += (int offset);
     
-    
-    void frontBack(int,int);
-    
-    /*      *** pushCutHack is NOT THREAD SAFE ***
+     /*      *** pushCutHack is NOT THREAD SAFE ***
      *
      * hack an in-place substring by overwriting a '\0' at beginning of last match.
      * The hack char is managed by the caller, which also copies the state, like so:
@@ -71,23 +66,23 @@ struct ParDoc {
      *      *** This is NOT THREAD SAFE ***
      *      used for recursive parsing where the substrings never overlap
      */
-    char pushCutHack() {
+    char pushCutHack(int endIdx) {
  
-        if (front>size-1) {
+        if (endIdx>size-1) {
             return '\0';
         }
         else {
-            char hack =_chr[front];
-            _chr[front] = '\0';
+            char hack =_chr[endIdx];
+            _chr[endIdx] = '\0';
             return hack;
         }
     }
     /* restore character - see pushCutHack for details
      */
-    void popCutHack(char hack) {
+    void popCutHack(int endIdx,char hack) {
         
-        if (front<size) {
-            _chr[front] = hack;
+        if (endIdx<size) {
+            _chr[endIdx] = hack;
         }
     }
     
@@ -98,5 +93,6 @@ struct ParDoc {
     bool nextWord();
     bool hasMore();
     int trimSpace(int i);
+    void trimTrailspace();
     void eatWhitespace();
 };

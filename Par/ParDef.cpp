@@ -1,5 +1,6 @@
 #import "ParDef.h"
 #import "ParTokDef.h"
+#import "ParFile.h"
 
 #import "DebugPrint.h"
 #define PrintParDef(...) DebugPrint(__VA_ARGS__)
@@ -8,64 +9,92 @@ void ParDef::initWithFile(const char*filename) {
     
     Par::MemoNow++;
     
-    const char *buf = readFile(filename);
+    const char *buf = ParFile::readInputFile(filename);
     if (buf) {
         initWithBuf(buf);
         delete (buf);
     }
     else {
-        fprintf(stdout,"*** ParDef::initWithFile(%s) - file not found\n", filename);
+        fprintf(stderr,"\n*** ParDef::initWithFile(%s) - file not found\n", filename);
         errors++;
     }
 }
+
 void ParDef::initWithBuf(const char*buf) {
 
     if (buf) {
         
         parTok = 0;
-        ParTokDef *parseDef = new ParTokDef();
-        Toks *toks = parseDef->buf2tok(buf,/*trace*/true,/*print*/true);
+        ParTokDef *parTok = new ParTokDef();
+        Toks *toks = parTok->buf2tok(buf,traceBuf,printToks);
         addPar(toks);
         bindGrammar();
     }
     else {
-         fprintf(stdout,"*** ParDef::initWithBuf - null buffer\n");
+         fprintf(stderr,"\n*** ParDef::initWithBuf - null buffer\n");
         errors++;
     }
 }
-
 Toks *ParDef::parseFile(const char *filename) {
 
     Par::MemoNow++;
 
-    char *buf = readFile(filename);
+    char *buf = ParFile::readInputFile(filename);
     if (buf) {
         Toks *toks = parseBuf(buf);
         free(buf);
         return toks;
     }
     else {
-        fprintf(stdout,"*** ParDef::parseFile(%s) - file not found\n", filename);
+        fprintf(stderr,"\n*** ParDef::parseFile(%s) - file not found\n", filename);
         errors++;
         return 0;
     }
 }
+
 /*
  */
-Toks *ParDef::parseBuf(const char *buf) {
+Toks *ParDef::parseBufTrace(const char *buf, const char *file) {
     
+    // redirect trace stdout to file
+    ParFile::redirectStdout(file);
+
+    // push trace/print state
+    bool pushTraceBuf = traceBuf;
+    bool pushPrintToks = printToks;
+    traceBuf = false;
+    printToks = true;
+
+    // parse the buffer
+    Toks * toks = parseBuf(buf);
+    
+    // pop trace/print state
+    ParFile::revertStdout();
+    traceBuf = pushTraceBuf;
+    printToks = pushPrintToks;
+    
+    return toks;
+}
+
+Toks *ParDef::parseBuf(const char *buf) {
+        
+    Par::MemoNow++;
+
     if (grammar.size()>0) {
         
         parTok = new ParTok(grammar[0]);
-        Toks *toks = parTok->buf2tok(buf,/*trace*/true,/*print*/true);
-        return toks;
+        parTok->buf2tok(buf,traceBuf,printToks);
     }
     else {
-        DebugPrint("*** ParDef::parseBuf has no tokens\n");
+        DebugPrint("\n*** ParDef::parseBuf has no tokens\n");
         return 0;
     }
+    return parTok->tokens;
 }
 
+/* Read the grammar, line by line, in the format of: a (b c)
+ * where a is the value of "par" and b c are the values of "list"
+ */
 void ParDef::addPar(Toks*toks) {
     
     Par *par = 0;
@@ -127,6 +156,7 @@ int ParDef::addList(Par*par,Toks*toks,int toki) {
                 toki = addList(pari, toks, toki);
                 break;
             }
+                
             case str2int("ands"): {
                 
                 Par *pari = new Par(kMatchAnd);
@@ -178,7 +208,6 @@ int ParDef::addList(Par*par,Toks*toks,int toki) {
                 }
                 break;
             }
-                
             case str2int("ahead"): {
                 
                 Par *pari = new Par(kMatchAhead);
@@ -265,7 +294,7 @@ inline void ParDef::bindName(Par*par) {
     }
     else if (name!="?" && par->matching!=kMatchAhead) {
         errors++;
-        fprintf(stdout,"*** ParDef::bindName: '%s' not found\n",name.c_str());
+        fprintf(stderr,"\n*** ParDef::bindName: '%s' not found\n",name.c_str());
      }
 }
 
@@ -300,7 +329,7 @@ void ParDef::bindParTree(Par*par) {
         bindName(par);
         
         if (errors>0) {
-            fprintf(stdout, "*** Exiting Par due to %i error%s \n\n",errors,errors>1 ? "s." : ".");
+            fprintf(stderr, "\n*** Exiting Par due to %i error%s \n\n",errors,errors>1 ? "s." : ".");
             exit(-1);
         }
 
@@ -327,28 +356,3 @@ void ParDef::bindGrammar() {
         bindParTree(par);
     }
 }
-#pragma mark - file
-
-char * ParDef::readFile(const char*inputFile) {
-    
-    FILE *file = freopen(inputFile, "r", stderr);
-    
-    if (file) {
-        
-        fseek(file, 0, SEEK_END);
-        long fileSize = ftell(file);
-        fseek(file, 0, SEEK_SET);
-        char *buf = (char*)malloc(fileSize+1);
-        fread((void*)buf, fileSize, 1, file);
-        buf[fileSize]='\0';
-        return buf;
-    }
-    else {
-        PrintParDef("\n *** file:%s not found",inputFile);
-        return 0;
-    }
-}
-
-
-
-

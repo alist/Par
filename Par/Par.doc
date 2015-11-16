@@ -115,7 +115,7 @@ There is also an option to (n' ') to not advance cursor.
     hello (n'^hello') // find hello at beginning without moving cursor
     world (n'world$')// find world at and without moving cursor
 
-    "hello big beautifil world" // which ignores everytning in between
+    "hello big beautiful world" // which ignores everytning in between
 
     0, 1: def :
     1, 2:  hello : hello
