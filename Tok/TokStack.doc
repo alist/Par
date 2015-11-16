@@ -1,0 +1,107 @@
+/* TokStack.doc -- manage a tree stack of tokens
+ 
+ TokStack was first created to solve a problem encountered by
+ Script languages where the resulting structure is a hierarchy.
+ Sometimes a parent may have several children in which to apply
+ the same transformation. So, how to know, in a token stream,
+ which is is the correct parent? For example:
+*/
+
+// staring with the tr3.def excerpt:
+
+def (tr3+)
+tr3 (node edge*)
+node (pathn pathi?)
+pathn ((path | name) value?)
+value (vlist | enumEq | scalarEq)
+enumEq ("=" name)
+...
+edge (input | child | output)
+child ( "(" tr3+ ")" pathi? )
+
+// parse the follwing source file:
+
+a (b c)
+f:a (b=5)
+
+// which should yield the output
+
+√ (a (b c)
+   f (b:5 c))
+
+// via the following token stream (toki,level: name : value)
+
+0, 1: def :
+1, 2:  tr3 :
+2, 3:   node :
+3, 4:    pathn :
+4, 6:      name : a
+5, 3:   edge :
+6, 4:    child :
+7, 5:     tr3 :
+8, 6:      node :
+9, 7:       pathn :
+10, 9:         name : b
+11, 5:     tr3 :
+12, 6:      node :
+13, 7:       pathn :
+14, 9:         name : c
+15, 2:  tr3 :
+16, 3:   node :
+17, 4:    pathn :
+18, 6:      name : f
+19, 4:    pathi :
+20, 5:     subt :
+21, 6:      pathn :
+22, 8:        name : a
+23, 3:   edge :
+24, 4:    child :
+25, 5:     tr3 :
+26, 6:      node :
+27, 7:       pathn :
+28, 9:         name : b
+29, 8:        value :
+30,10:          scalarEq :
+31,11:           num : 5
+
+// so how to know
+
+31,11: num : 5
+
+// should only be assigned to the tr3 created at
+
+25, 5: tr3 :
+
+// and not to
+
+15, 2: tr3 :
+ 1, 2: tr3 :
+
+// the way that Tr3Expand resolved this question is to call
+
+    if (tok->tokType==str2int("tr3")) {
+        tokStack.setStack(tok->level, toki);
+    }
+
+// resulting in a stack, like so (toki: TokLevel[])
+
+ 1: (1,2)
+ 7: (1,2)(7,5)
+11: (1,2)(7,5)(11,5)
+15: (1,2)(15,2)
+25: (1,2)(15,2)(25,5)
+
+// externally, Tr3Expand uses tokiParent[toki] to point to a token's parent Tr3
+// internally, TokStack maps the current level to the parent Tr3
+//              and assigns the current parent to tokiParent[toki]
+//
+// the result, at each call to call to set
+
+ 1: tokiParent[ 1]: 0  level:2  levelParent[2]: 0
+ 7: tokiParent[ 7]: 1  level:5  levelParent[5]: 1
+11: tokiParent[11]: 1  level:5  levelParent[5]: 1
+15: tokiParent[15]: 0  level:2  levelParent[2]: 0
+25: tokiParent[25]:15  level:5  levelParent[5]:15
+
+
+
