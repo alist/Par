@@ -22,6 +22,10 @@ pcre*.*     - Perl-Compatible Regular Expressions
 <name>.def  - definition file for a grammar
 <name>.test - test source example for <name>.def
 
+ParTest.cpp - run tests - also the first working example that uses Par to parse a file
+ParTest.def - definition of macros to read and run Par tests
+ParTest.test - set of test examples to run and verify
+
 WALKTRHOUGH of syntax -------------------------------------------------
 
 Par extends regular expressions with a symbolic token stream
@@ -303,46 +307,4 @@ To fix, use a regex with initial anchor '^(' and unanchored ')'
     
     0, 1: paren :
     1, 4:    ~inside : yo
-
-DEF ------------------------
-
-def (hello ~ world ~ emoji)+
-hello ('^hello')
-world ('^world')
-emoji('^😊|😃|😏|😈')
-
-IN ------------------------
-
-hello 😊 world
-
-OUT ---------------------
-
-0, 2:  hello : hello
-1, 2:  emoji : 😊
-2, 2:  world : world
-
-DEF ------------------------
-
-def (a b{2,3} c)
-a('^a')
-b('^b')
-c('^c')
-
-IN ------------------------
-
-a bbb c
-
-OUT -----------------------
-
-0, 1: def :
-1, 2:  a : a
-2, 2:  b : b
-3, 2:  b : b
-4, 2:  b : b
-5, 2:  c : c
-
-DONE -----------------------
-
-
-
 

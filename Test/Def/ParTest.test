@@ -9,7 +9,7 @@
 3, 2:  world : world
 
 
-<DEF> def(hello | world)+ hello('he?ll?o') world('wo?rld$')
+<DEF> def (hello|world)+ hello('he?ll?o') world('wo?rld$')
 <IN>  hlo yo wrld
 <OUT>
 0, 1: def :
@@ -17,7 +17,7 @@
 2, 1: def :
 3, 2:  world : wrld
 
-<DEF>   def(hello world) hello(n'^hello')world(n'world$')
+<DEF>   def (hello world) hello(n'^hello') world(n'world$')
 <IN>    hello big beautiful world
 <OUT>
 0, 1: def :

@@ -14,7 +14,6 @@ void ParTest::testOne() {
 
     parDef->printToks = true;
     parDef->initWithFile("Hello.def");
-    //ParFile::redirectStdout2Stderr();
     parDef->traceBuf = true;
     parDef->parseFile("Hello.test");
 }
