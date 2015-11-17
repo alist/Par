@@ -1,14 +1,16 @@
-<HEAD> wave (a ~ c)+
-<DEF> wave (a ~ c)+ a('^a') c('^c')
-<IN> a b
-<OUT>
-0, 1: wave :
-1, 2:  a : a
-2, 2:  ~ : b
-
 <HEAD>  Hello World
-<DEF>   def(hello | world)+ hello('he?ll?o') world('wo?rld$')
-<IN>    hlo yo wrld
+
+<DEF> def (hello | world)+ hello('hello') world('world')
+<IN>  hello world
+<OUT>
+0, 1: def :
+1, 2:  hello : hello
+2, 1: def :
+3, 2:  world : world
+
+
+<DEF> def(hello | world)+ hello('he?ll?o') world('wo?rld$')
+<IN>  hlo yo wrld
 <OUT>
 0, 1: def :
 1, 2:  hello : hlo
@@ -21,17 +23,6 @@
 0, 1: def :
 1, 2:  hello : hello
 2, 2:  world : world
-
-<HEAD> unmatched ~middle in def (hello ~middle world)
-
-<DEF>  def(hello ~middle world) hello('^hello') world('^world')
-<IN>   hello big beautiful world
-<OUT>
-0, 1: def :
-1, 2:  hello : hello
-2, 2:  ~middle : big beautiful
-3, 2:  world : world
-
 
 <HEAD>  case sensitive
 
@@ -75,11 +66,26 @@
 <IN> hello beautiful world (yo) 😊
 <OUT> 0, 1: woohoo : 😊
 
-<HEAD> def (a ~ c ~ e)+
-<DEF> def (a ~ c ~ e)+ a ('^a') c ('^c') e ('^e')
+<HEAD> wave (a ~ c)+
+<DEF> wave (a ~ c)+ a('^a') c('^c')
+<IN> a b c
+<OUT>
+0, 1: wave :
+1, 2:  a : a
+2, 2:  ~ : b
+3, 2:  c : c
+<IN> a b
+<OUT>
+0, 1: wave :
+1, 2:  a : a
+2, 2:  ~ : b
+
+
+<HEAD> wave (a ~ c ~ e)+
+<DEF> wave (a ~ c ~ e)+ a ('^a') c ('^c') e ('^e')
 <IN> a b c d a b c d e
 <OUT>
-0, 1: def :
+0, 1: wave :
 1, 2:  a : a
 2, 2:  ~ : b
 3, 2:  c : c
@@ -91,7 +97,7 @@
 9, 2:  e : e
 <IN> a b c d a b c d
 <OUT>
-0, 1: def :
+0, 1: wave :
 1, 2:  a : a
 2, 2:  ~ : b
 3, 2:  c : c
@@ -101,33 +107,33 @@
 7, 2:  c : c
 8, 2:  ~ : d
 
-<HEAD> def (a ~ c ~ e?)+
-<DEF> def (a ~ c ~ e?)+ a ('^a') c ('^c') e ('^e')
+<HEAD> wave (a ~ c ~ e?)+
+<DEF> wave (a ~ c ~ e?)+ a ('^a') c ('^c') e ('^e')
 <IN> a b c d
 <OUT>
-0, 1: def :
+0, 1: wave :
 1, 2:  a : a
 2, 2:  ~ : b
 3, 2:  c : c
 4, 2:  ~ : d
 
 
-<HEAD> def (a b{2,3} c)
-<DEF> def (a b{2,3} c) a('^a') b('^b') c('^c')
+<HEAD> range (a b{2,3} c)
+<DEF> range (a b{2,3} c) a('^a') b('^b') c('^c')
 <IN> a bbb c
 <OUT>
-0, 1: def :
+0, 1: range :
 1, 2:  a : a
 2, 2:  b : b
 3, 2:  b : b
 4, 2:  b : b
 5, 2:  c : c
 
-<HEAD> def (a ~bc de)
-<DEF> def(a ~bc de) a('^a') bc(b c) de(d e) b('^b') c('^c') d('^d') e('^e')
+<HEAD> lookahead (a ~bc de)
+<DEF> lookahead(a ~bc de) a('^a') bc(b c) de(d e) b('^b') c('^c') d('^d') e('^e')
 <IN> a b c d e
 <OUT>
-0, 1: def :
+0, 1: lookahead :
 1, 2:  a : a
 2, 2:  ~bc :
 3, 3:   b : b
@@ -137,14 +143,14 @@
 7, 3:   e : e
 <IN> a b c d
 <OUT>
-0, 1: def :
+0, 1: lookahead :
 1, 2:  a : a
 
-<HEAD> def (a ~b c ~d e)+
-<DEF> def(a ~b c ~d e)+ a('^a') c('^c') e('^e')
+<HEAD> lookahead (a ~b c ~d e)+
+<DEF> lookahead(a ~b c ~d e)+ a('^a') c('^c') e('^e')
 <IN> a b c d e
 <OUT>
-0, 1: def :
+0, 1: lookahead :
 1, 2:  a : a
 2, 2:  ~b : b
 3, 2:  c : c
@@ -152,33 +158,23 @@
 5, 2:  e : e
 <IN> a b c d
 <OUT>
-0, 1: def :
+0, 1: lookahead :
 1, 2:  a : a
 2, 2:  ~b : b
 3, 2:  c : c
 <IN> a b c
 <OUT>
-0, 1: def :
+0, 1: lookahead :
 1, 2:  a : a
 2, 2:  ~b : b
 3, 2:  c : c
 <IN> a b
 <OUT>
-0, 1: def :
+0, 1: lookahead :
 1, 2:  a : a
 <IN> a
 <OUT>
-0, 1: def :
+0, 1: lookahead :
 1, 2:  a : a
-
-
-<DEF> def (hello | world)+ hello('hello') world('world')
-<IN>  hello world
-<OUT>
-0, 1: def :
-1, 2:  hello : hello
-2, 1: def :
-3, 2:  world : world
-
 
 <END>

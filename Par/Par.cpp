@@ -199,7 +199,8 @@ inline void Par::parseBefore(Toks *toks, ParDoc&doc, int level, Par *&before, in
             doc.idx = startIdx;
             
             for (Par*beforei : before->parList) {
-                beforei->parse(toks, doc, level, before);
+                // parse will add 1 back to ~name
+                beforei->parse(toks, doc, level-1, before);
             }
             // reinstate full string from '\0'
             cut.popCutHack(endIdx,hack);
