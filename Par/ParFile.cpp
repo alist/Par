@@ -1,12 +1,9 @@
-#import "ParFile.h"
-#import "ParTokDef.h"
+/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
 
-#import "DebugPrint.h"
-#define PrintParFile(...) DebugPrint(__VA_ARGS__)
+#import "ParFile.h"
 
 int ParFile::fd = 0;
 fpos_t ParFile::pos = 0;
-
 
 /* redirect stdout to stderr */
 void ParFile:: redirectStdout2Stderr() {
@@ -46,7 +43,7 @@ char *ParFile::readInputFile(const char*inputFile) {
         return buf;
     }
     else {
-        PrintParFile("\n *** file:%s not found\n",inputFile);
+        fprintf(stderr,"\n *** file:%s not found\n",inputFile);
         return 0;
     }
 }
@@ -106,7 +103,7 @@ char *trimWhitespace(char*buf) {
     }
     return normBuf;
  }
-char *ParFile::singleLineFromString(string*str) {
+char *ParFile::singleLineFromString(std::string*str) {
     
     const char *v = str->c_str();
     static char buf[180];

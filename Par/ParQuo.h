@@ -1,3 +1,5 @@
+/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+
 #import <locale.h>
 #import <stdlib.h> 
 #import <string.h>

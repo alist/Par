@@ -1,6 +1,6 @@
+/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
 
 #import "Tok.h"
-
 #define PrintParTok(...) DebugPrint(__VA_ARGS__)
 
 TokNameEnum Tok::nameHash;    // translate token name string into enum type

@@ -7,7 +7,7 @@
  which is is the correct parent? For example:
 */
 
-// staring with the tr3.def excerpt:
+// starting with the tr3.par excerpt:
 
 def (tr3+)
 tr3 (node edge*)

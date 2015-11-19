@@ -1,3 +1,4 @@
+/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
 
 #import <unordered_map>
 #import <deque>
@@ -9,7 +10,10 @@
  * The compiler will complain about duplicates for static collisions
  *
  * *** Warning *** There may be dynamic collisions during runtime
- * grammar with 9 characters or less should always be ok
+ * grammar with 9 characters or less should always be ok 
+ * as this shifts 7 bits in a int64_t  words (9*7 => 63 bits)
+ *
+ * TODO: compare with Murmur3_32 -> is there a int64_t version? performance? -ws
  */
 constexpr int64_t str2int(const char* str, int h = 0) {
     return !str[h] ? 0 : (str2int(str, h+1)<<7 | str2int(str, h+1)>>57) ^ str[h];

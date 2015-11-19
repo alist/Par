@@ -1,15 +1,15 @@
 
-Files
+Files -------------------------------------------------
 
-Def.def     - marcros that define the Par parser
+Par.boot    - bootstrap macros that define the Par parser
 Def.par     - informal description of Par syntax
-ParMacro.h  - convert macros to Par grammar, used only for bootstrap
-ParDef.*    - bootstrap the Par parser from Def.def
+ParBoot.h  - convert macros to Par grammar, used only for bootstrap
+ParDef.*    - bootstrap the Par parser from Def.par
 
 Par.*       - main parsing of input document
-ParPar.*    - convert *.def file into grammar
+ParPar.*    - convert *.par file into grammar
 ParDoc.*    - manage an input document with shared buffer
-ParTok.*    - Token stream
+ParToks.*    - Token stream
 ParQuo.*    - match a literal string
 ParRegx.*   - match a regex pattern
 
@@ -19,14 +19,14 @@ TokStack.*  - utility for calling code to manage hierachy
 
 pcre*.*     - Perl-Compatible Regular Expressions
 
-<name>.def  - definition file for a grammar
-<name>.test - test source example for <name>.def
+<name>.par  - parser grammar file
+<name>.test - test source example for <name>.par
 
 ParTest.cpp - run tests - also the first working example that uses Par to parse a file
-ParTest.def - definition of macros to read and run Par tests
-ParTest.test - set of test examples to run and verify
+TestPar.par - parser grammar to read and run Par tests
+TestPar.test - set of test examples to run and verify
 
-WALKTRHOUGH of syntax -------------------------------------------------
+Syntax Walkthrough -------------------------------------------------
 
 Par extends regular expressions with a symbolic token stream
 that includes a: tokId, level, symbol, and optional value.
@@ -139,7 +139,7 @@ to see if the following pattern matches. So:
     2, 2:  ~middle : big beautiful
     3, 2:  world : world
 
-Above, '~middle' didnt match subsequent definitions.
+Above, '~middle' didnt match subsequent sub-grammar
 To add a subsearch, define a 'middle':
     
     def (hello ~middle world)
@@ -256,11 +256,11 @@ The wave '~' (tilde) searches in parallel. For Example:
     world (i'^world'|i'^planet'|i'^earth')
     close (i'^yours truly')
     
-    // Given the following input document
+Given the following input document
     
     "Yo! Good morning big beautiful planet earth - Aloha from yours truly."
     
-    // produced the following token stream (#,level: name, value)
+Produces the following token stream
     
     0, 2:  ~ : Yo!
     1, 2:  hello : Good morning
@@ -273,9 +273,11 @@ The wave '~' (tilde) searches in parallel. For Example:
     8, 2:  close : yours truly
     9, 2:  ~ : .
 
-The '~' tokens are the unmatched portions from the document -- the water between
-the islands. Par will advance word by word, and try all the the patterns until a
-match is found.
+The '~' tokens are the unmatched portions of the document
+-- the water between the islands.
+
+Par will advance word by word, and try all the patterns until
+a match is found.
 
 
 GOTCHA - LookAhead between literal quotes -------------------------------

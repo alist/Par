@@ -1,3 +1,5 @@
+/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+
 #import "ParQuo.h"
 #import "ParRegx.h"
 #import "ParDoc.h"
@@ -52,13 +54,13 @@ struct Par {
     static int MaxCountDefault; // max matches for a* or a+
     static int MaxLevelDefault; // max levels deep 
  
-    /* Used only by ParMacro Par_() to bootstrap the parser 
+    /* Used only by ParBoot Par_() to bootstrap the parser 
      */
     Par(){init();};
     void setName(const char*who_);
     void init(RepeatType);
     
-    /* Used while parsing *.def files 
+    /* Used while parsing *.par files 
      */
     Par(MatchType t){init(t);}
     Par(string*n)   {init(); name = *n; }

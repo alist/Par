@@ -1,7 +1,6 @@
-#import "TokStack.h"
+/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
 
-#import "DebugPrint.h"
-#define PrintTokStack(...) DebugPrint(__VA_ARGS__)
+#import "TokStack.h"
 
 TokStack::TokStack() {
     
@@ -44,8 +43,6 @@ void TokStack::setStack(int level, int toki) {
     TokLevel *newBack = new TokLevel(toki,level);
     stack.push_back(newBack);
     tokiParent[toki] = levelParent[level];
-    
-    //PrintTokStack("%i: level:%i tokiParent[%i]:%i levelParent[%i]:%i\n",toki,level,toki,tokiParent[toki],level,levelParent[level]);
 }
 
 int TokStack::getToki() {

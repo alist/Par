@@ -1,10 +1,11 @@
+/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+
 #import <locale.h>
 #import <stdlib.h> 
 #import <string>
 #import "ParDoc.h"
 
-/* PCRE is not standard on OS X. So, install local version to this product in ./pcre
- To update:
+/*  To update:
   1) download the zip file from http://pcre.org/ and unzip to a temp directory
   2) within the temp directory, excute: "./configure; make; make install" 
   3) cp /usr/local/include/pcre* pcre/include
@@ -164,7 +165,7 @@ struct ParRegx  {
     }    
     
     void eval() {}
-    operator int() { return (int)atoi(result.c_str()); }
+    ///operator int() { return (int)atoi(result.c_str()); }
     operator float() { return (float)atof(result.c_str()); }    
     operator const char *() { return result.c_str(); }
 };

@@ -1,3 +1,5 @@
+/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+
 #import "Par.h"
 #import "Tok.h"
 #import <stdarg.h>
@@ -7,8 +9,8 @@
 
 #define PrintParseTok(...) Debug(if (Par::Trace) { DebugPrint(__VA_ARGS__); })
 
-int  Par::MemoNow=0;
-bool Par::Trace=false;
+int  Par::MemoNow=0;            // current global memoize id - increase for every new document
+bool Par::Trace=false;          // show a sliding window of input doc while tokenizing
 int  Par::MaxCountDefault = 99; // max matches for a* or a+
 int  Par::MaxLevelDefault =200; // max levels deep into parse tree
 
@@ -116,6 +118,11 @@ inline void Par::printLevelInputMargin(int level, ParDoc&doc) {
     printLevelIndent(level);
 }
 
+#pragma mark - push pop tok
+
+/* Par adds tokens to toks while matching and backtracks
+ * to previous position in toks if the match fails
+ */
 inline int Par::pushTok(Toks*toks, int level, ParDoc&doc) {
     
     int ret = (int)toks->size();
@@ -327,7 +334,7 @@ inline bool Par::parseOr(Toks*toks, ParDoc &doc, int level, Par *&before) {
 
 #pragma mark - parseWave Islands
 
-/* parseWave looks of islands of matches by scanning the document 
+/* parseWave looks for islands of matches by scanning the document
  * word-by-word until one of the patterns is matched and repeat.
  * Any unmatched portions between are put in a '~' token. 
  * If no matches, then the document backtracks to the beginning.
@@ -400,7 +407,7 @@ inline bool Par::parseWave(Toks*toks, ParDoc &doc, int level, Par *&ignore) {
             endIdx = doc.idx;
             size_t tokBefi = toks->size();
 
-            if (par->parse(toks, doc,level, before) &&
+            if (par->parse(toks, doc, level, before) &&
                 toks->size()>tokBefi) {
                 
                 count ++;

@@ -1,3 +1,5 @@
+/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+
 #import "ParDoc.h"
 #import "stdlib.h"
 #import "math.h"

@@ -1,6 +1,0 @@
-test (HEAD ~ DEF ~ IN ~ OUT ~ END?)+
-HEAD('^<HEAD>')
-DEF ('^<DEF>')
-IN  ('^<IN>')
-OUT ('^<OUT>')
-END ('^<END>')

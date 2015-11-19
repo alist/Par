@@ -1,16 +1,18 @@
-#import "ParTok.h"
+/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+
+#import "ParToks.h"
 #import "Tok.h"
 #include <assert.h>
 
 #import "DebugPrint.h"
-#define PrintParTok(...) DebugPrint(__VA_ARGS__)
+#define PrintParToks(...) DebugPrint(__VA_ARGS__)
 
 /* Initialize name hash, which is used for "case str2int("name"): statements.
  * starting from root node (usually a "def(...)", parse the graph depth first
  * and add name and its hash to two unordered_maps.
  * Memoize to eliminate reprocessing cyclic loops
  */
-void ParTok::initNameHash(Par *par) {
+void ParToks::initNameHash(Par *par) {
     
     // only pass through once - break cycles
     if (par->memoMe < Par::MemoNow) {
@@ -39,8 +41,11 @@ void ParTok::initNameHash(Par *par) {
     }
 }
 
-
-Toks *ParTok::buf2tok(const char *buf, bool trace, bool print) {
+/* buf2tok is invoked twice:
+ * 1) ParParToks creates the grammar to parse grammars (via buf2Grammar)
+ * 2) ParToks uses the grammar to parse texts (via parseBuf)
+ */
+Toks *ParToks::buf2tok(const char *buf, bool trace, bool print, FILE *fp) {
     
     Par::MemoNow++;
     Par::Trace=trace;
@@ -48,39 +53,43 @@ Toks *ParTok::buf2tok(const char *buf, bool trace, bool print) {
     initNameHash(root);
     
     ParDoc doc((char*)buf);
-    root->parseStart(tokens,doc);
+    root->parseStart(toks, doc);
     if (print) {
-        printToks();
+        printToks(fp);
     }
-    return tokens;
+    return toks;
 }
 
-void ParTok::deleteToks() {
+void ParToks::deleteToks() {
 
-    if (tokens) {
+    if (toks) {
         
-        for (Tok *token : *tokens) {
+        for (Tok *token : *toks) {
             delete token;
         }
-        tokens->clear();
-        tokens = 0;
+        toks->clear();
+        toks = 0;
     }
 }
 
-void ParTok::printToks() {
+void ParToks::printToks(FILE *fp) {
+    
+    fprintf(fp,"\n");
     
     int row=0;
-    for (Tok* tok : *tokens) {
+    for (Tok* tok : *toks) {
         
-        PrintParTok("%2i,%2i:",row++,tok->level);
+        fprintf(fp,"%2i,%2i:",row++,tok->level);
         
         for (int col = 0; col<tok->level; col++) {
-            PrintParTok(" ");
+            fprintf(fp," ");
         }
         
         TokType type = tok->tokType;
         const char* name = Tok::hashName[type].c_str();
         const char* value = tok->value->c_str();
-        PrintParTok("%s : %s \n", name, value);
+        fprintf(fp,"%s : %s \n", name, value);
     }
+    fprintf(fp,"\n");
+
 }

@@ -1,16 +1,48 @@
+/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+
 #import <vector>
 #import <stdlib.h>
 #import <string.h>
-/* ParDoc saves state on a shared char* _chr ; many ParDocs may point to the same _chr.
+
+/* ParDoc is a shared char* on _chr -- ParDoc is SINGLE THREADED -- see below
+ * Many - many ParDocs may point to the same _chr, which is useful for backtracking.
+ * As the Par matches words in grammar, it advances the cursor and adds another ParDoc 
+ * on the stack. For a non-match, Par backtracks pops prior versions of ParDoc off the stack.
+ * Because all ParDocs point to the samem _chr, there are no copies needed.
  *
+ * There is a special case for lookahead parsing; for example: cd in
+        
+    a(b ~cd e)
+    cd (c d) 
+    c('c') 
+    d('d') 
+    e('e')
+ 
+ * where ~cd needs to match 
+ 
+    "b c d e" // "c d" occuring before "e"
+ 
+ * but not match 
+ 
+    "b e c d" // "c d" occuring after "e"
+ 
+ * There are two approaches: slow and fast.
+ * Slow approach is to create a new string "c d" and delete after subparse;
+ * Fast approach is to terminate before lookahead match: "b c d" + '\0' + "e"
+ * Given the overhead for new() and free(), a fast single-thread probably
+ * outperforms a slow multi-thread for most grammars and documents, so
+ * ParDoc uses the fast approach. This, ParDoc is NOT THREADSAFE for 
+ * lookahead (only). See pushCutHack and popCutHack for details.
+ *
+ * Island parsing is not affected, because the unmatched portion of _chr
+ * is copied to a newr "unmatched" token and then handled after tokenizing.
  */
 struct ParDoc {
     
     char*_chr;
     
-    //int front; // front of last match;
-    int idx;  // cursor after last match
-    int size;
+    int idx;  // index of cursor after last match
+    int size; // total size to beginning of terminating whitespace in _chr
     int docId;
     
     static int nextDocId;

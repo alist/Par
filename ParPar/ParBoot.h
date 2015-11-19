@@ -1,20 +1,22 @@
+/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+
 #import "Par.h"
 
-/* Bootstrap the grammar for the parsing grammars
+/* Bootstrap the ParPar grammar for the parsing grammars
  *
  * TODO: this is the last vestige of the prior version of the Par app, which
- * would always create a .par for from each .def file, which in turn was
+ * would always create a .boot from each .par grammar file, which in turn was
  * included multiple times to contruct a static parser class. This meant
  * that a new binary was needed for any modifications to the grammar.
  *
- * Don't use ParMacro. Instead, use ParDef. With ParDef a modified grammar
+ * Don't use ParBoot. Instead, use ParPar. With ParPar a modified grammar
  * can be downloaded and deployed without deploying a new binary.
  */
 
-/* Create constructors with up to 10 (Par*p) rvalue defined in Def_(...) macros.
- * Still used for bootstrapping the definition of the parser in Def.par file
- * which takes a .def file and creates a vector of Pars that reference each other.
- * These macros are not used for the .def files.
+/* Create constructors with up to 10 (Par*p) rvalue defined in Par_(...) macros.
+ * Still used for bootstrapping the grammar of the parser in Par.boot file
+ * which creates a vector of Pars that reference each other.
+ * These macros are not used for the .par files.
  *
  */
 #define ParamBlock(x,y)\

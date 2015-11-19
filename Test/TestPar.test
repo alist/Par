@@ -1,0 +1,181 @@
+[HEAD]  Hello World
+
+[PAR] def (hello | world)+ hello('hello') world('world')
+[IN]  hello world
+[OUT]
+0, 1: def :
+1, 2:  hello : hello
+2, 1: def :
+3, 2:  world : world
+
+
+[PAR] def (hello|world)+ hello('he?ll?o') world('wo?rld$')
+[IN]  hlo yo wrld
+[OUT]
+0, 1: def :
+1, 2:  hello : hlo
+2, 1: def :
+3, 2:  world : wrld
+
+[PAR] def (hello world) hello(n'^hello') world(n'world$')
+[IN]  hello big beautiful world
+[OUT]
+0, 1: def :
+1, 2:  hello : hello
+2, 2:  world : world
+
+[HEAD]  case sensitive
+
+[PAR] def(hello world)+ hello(i'hello') world(i'world')
+[IN]  Hello WORLD
+[OUT]
+0, 1: def :
+1, 2:  hello : Hello
+2, 2:  world : WORLD
+
+
+[HEAD]  surrounding parethesis
+
+[PAR]   def(hello world)+ hello('(h(el)?lo)') world('world')
+[IN]    hello world
+[OUT]
+0, 1: def :
+1, 2:  hello : hello
+2, 2:  world : world
+
+[IN]    hlo world
+[OUT]
+0, 1: def :
+1, 2:  hello : hlo
+2, 2:  world : world
+
+
+[HEAD] Mixed Emoji
+
+[PAR] def (hello world paren? emoji?)+ hello('hello') world('world') paren("(" inside ")") inside(i'[a-z ]*') emoji('^😊|😃|😏|😈')
+[IN] hello world (yo) 😊
+[OUT]
+0, 1: def :
+1, 2:  hello : hello
+2, 2:  world : world
+3, 2:  paren :
+4, 3:   inside : yo
+5, 2:  emoji : 😊
+
+[PAR] woohoo ('hello' 'world' ("(" i'[a-z ]*' ")")? '^😊|😃|😏|😈')+
+[IN] hello beautiful world (yo) 😊
+[OUT] 0, 1: woohoo : 😊
+
+[HEAD] wave (a ~ c ~ e?)+
+ 
+[PAR] wave (a ~ c)+ a('^a') c('^c')
+[IN] a b c
+[OUT]
+0, 1: wave :
+1, 2:  a : a
+2, 2:  ~ : b
+3, 2:  c : c
+[IN] a b
+[OUT]
+0, 1: wave :
+1, 2:  a : a
+2, 2:  ~ : b
+
+[PAR] wave (a ~ c ~ e)+ a ('^a') c ('^c') e ('^e')
+[IN] a b c d a b c d e
+[OUT]
+0, 1: wave :
+1, 2:  a : a
+2, 2:  ~ : b
+3, 2:  c : c
+4, 2:  ~ : d
+5, 2:  a : a
+6, 2:  ~ : b
+7, 2:  c : c
+8, 2:  ~ : d
+9, 2:  e : e
+[IN] a b c d a b c d
+[OUT]
+0, 1: wave :
+1, 2:  a : a
+2, 2:  ~ : b
+3, 2:  c : c
+4, 2:  ~ : d
+5, 2:  a : a
+6, 2:  ~ : b
+7, 2:  c : c
+8, 2:  ~ : d
+
+[PAR] wave (a ~ c ~ e?)+ a ('^a') c ('^c') e ('^e')
+[IN] a b c d
+[OUT]
+0, 1: wave :
+1, 2:  a : a
+2, 2:  ~ : b
+3, 2:  c : c
+4, 2:  ~ : d
+
+
+[HEAD] range (a b{2,3} c)
+ 
+[PAR] range (a b{2,3} c) a('^a') b('^b') c('^c')
+[IN] a bbb c
+[OUT]
+0, 1: range :
+1, 2:  a : a
+2, 2:  b : b
+3, 2:  b : b
+4, 2:  b : b
+5, 2:  c : c
+
+[HEAD] lookahead (a ~bc de)
+ 
+[PAR] lookahead(a ~bc de) a('^a') bc(b c) de(d e) b('^b') c('^c') d('^d') e('^e')
+[IN] a b c d e
+[OUT]
+0, 1: lookahead :
+1, 2:  a : a
+2, 2:  ~bc :
+3, 3:   b : b
+4, 3:   c : c
+5, 2:  de :
+6, 3:   d : d
+7, 3:   e : e
+[IN] a b c d
+[OUT]
+0, 1: lookahead :
+1, 2:  a : a
+
+[HEAD] lookahead (a ~b c ~d e)+
+ 
+[PAR] lookahead(a ~b c ~d e)+ a('^a') c('^c') e('^e')
+[IN] a b c d e
+[OUT]
+0, 1: lookahead :
+1, 2:  a : a
+2, 2:  ~b : b
+3, 2:  c : c
+4, 2:  ~d : d
+5, 2:  e : e
+[IN] a b c d
+[OUT]
+0, 1: lookahead :
+1, 2:  a : a
+2, 2:  ~b : b
+3, 2:  c : c
+[IN] a b c
+[OUT]
+0, 1: lookahead :
+1, 2:  a : a
+2, 2:  ~b : b
+3, 2:  c : c
+[IN] a b
+[OUT]
+0, 1: lookahead :
+1, 2:  a : a
+[IN] a
+[OUT]
+0, 1: lookahead :
+1, 2:  a : a
+
+[END]

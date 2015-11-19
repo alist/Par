@@ -1,11 +1,9 @@
-/* this is manually maintained description of Def.par ; it is not compiled
- * it could be out of sync, if changes were made to Def.par, and not here
- * see Def.par for more details
+/* this is manually maintained description of Par.boot ; it is not compiled
+ * it could be out of sync, if changes were made to Par.boot, and not here
+ * see Par.boot for more details
  */
 def (par list)+
-
 par (name)
-
 list ("(" (waves | ors | ands | item | list)+ ")" repeat? )
 
   waves (item (wave (ors | ands | item))+ )

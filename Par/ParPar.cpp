@@ -1,52 +1,55 @@
-#import "ParDef.h"
-#import "ParTokDef.h"
+/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+
+#import "ParPar.h"
+#import "ParParToks.h"
 #import "ParFile.h"
 
 #import "DebugPrint.h"
 #define PrintParDef(...) DebugPrint(__VA_ARGS__)
 
-void ParDef::initWithFile(const char*filename) {
+void ParPar::readGrammar(const char*filename, FILE *fp) {
     
     Par::MemoNow++;
     
     const char *buf = ParFile::readInputFile(filename);
     if (buf) {
-        initWithBuf(buf);
+        buf2Grammar(buf,fp);
         delete (buf);
     }
     else {
-        fprintf(stderr,"\n*** ParDef::initWithFile(%s) - file not found\n", filename);
+        fprintf(stderr,"\n*** ParPar::initWithFile(%s) - file not found\n", filename);
         errors++;
     }
 }
 
-void ParDef::initWithBuf(const char*buf) {
+void ParPar::buf2Grammar(const char*buf, FILE*fp) {
 
     if (buf) {
         
-        parTok = 0;
-        ParTokDef *parTok = new ParTokDef();
-        Toks *toks = parTok->buf2tok(buf,traceBuf,printToks);
-        addPar(toks);
+        parToks = 0;
+        ParParToks *parParToks = new ParParToks();
+        Toks *toks = parParToks->buf2tok(buf,traceDoc,printToks,fp);
+        toks2Grammar(toks);
         bindGrammar();
     }
     else {
-         fprintf(stderr,"\n*** ParDef::initWithBuf - null buffer\n");
+         fprintf(stderr,"\n*** ParPar::initWithBuf - null buffer\n");
         errors++;
     }
 }
-Toks *ParDef::parseFile(const char *filename) {
+
+Toks *ParPar::parseFile(const char *filename, FILE *fp) {
 
     Par::MemoNow++;
 
     char *buf = ParFile::readInputFile(filename);
     if (buf) {
-        Toks *toks = parseBuf(buf);
+        Toks *toks = parseBuf(buf,fp);
         free(buf);
         return toks;
     }
     else {
-        fprintf(stderr,"\n*** ParDef::parseFile(%s) - file not found\n", filename);
+        fprintf(stderr,"\n*** ParPar::parseFile(%s) - file not found\n", filename);
         errors++;
         return 0;
     }
@@ -54,48 +57,52 @@ Toks *ParDef::parseFile(const char *filename) {
 
 /*
  */
-Toks *ParDef::parseBufTrace(const char *buf, const char *file) {
+Toks *ParPar::parseBuf2File(const char *buf, const char *file) {
     
     // redirect trace stdout to file
-    ParFile::redirectStdout(file);
+    FILE *fp = freopen(file, "w", stdout);
 
     // push trace/print state
-    bool pushTraceBuf = traceBuf;
+    bool pushTraceBuf = traceDoc;
     bool pushPrintToks = printToks;
-    traceBuf = false;
-    printToks = true;
+    traceDoc = false; // don't show detail of tokenizing
+    printToks = true; // do show resulting tokens
 
     // parse the buffer
-    Toks * toks = parseBuf(buf);
+    Toks * toks = parseBuf(buf,fp);
     
     // pop trace/print state
-    ParFile::revertStdout();
-    traceBuf = pushTraceBuf;
+    fflush(fp);
+    fclose(fp);
+
+    traceDoc = pushTraceBuf;
     printToks = pushPrintToks;
     
     return toks;
 }
 
-Toks *ParDef::parseBuf(const char *buf) {
-        
+Toks *ParPar::parseBuf(const char *buf, FILE *fp) {
+    
+    // memoize the depth-first binding of symbol names
     Par::MemoNow++;
 
     if (grammar.size()>0) {
         
-        parTok = new ParTok(grammar[0]);
-        parTok->buf2tok(buf,traceBuf,printToks);
+        parToks = new ParToks(grammar[0]);
+        parToks->buf2tok(buf,traceDoc,printToks,fp);
     }
     else {
-        DebugPrint("\n*** ParDef::parseBuf has no tokens\n");
+        DebugPrint("\n*** ParPar::parseBuf has no tokens\n");
         return 0;
     }
-    return parTok->tokens;
+    return parToks->toks;
 }
 
-/* Read the grammar, line by line, in the format of: a (b c)
+/* parse  a (b c?)+
+ * Read the grammar, line by line, in the format of: a (b c)
  * where a is the value of "par" and b c are the values of "list"
  */
-void ParDef::addPar(Toks*toks) {
+void ParPar::toks2Grammar(Toks*toks) {
     
     Par *par = 0;
     
@@ -131,7 +138,7 @@ void ParDef::addPar(Toks*toks) {
     }
 }
 
-int ParDef::addList(Par*par,Toks*toks,int toki) {
+int ParPar::addList(Par*par,Toks*toks,int toki) {
     
     Tok *tok = (*toks)[toki];
     int level = tok->level;
@@ -262,7 +269,7 @@ int ParDef::addList(Par*par,Toks*toks,int toki) {
 
 /* find named par and get its parList
  */
-inline void ParDef::bindName(Par*par) {
+inline void ParPar::bindName(Par*par) {
     
     string &name = par->name;
     Par *pari = namePars[name];
@@ -285,22 +292,17 @@ inline void ParDef::bindName(Par*par) {
             par->match    = pari->match;
             par->matching = pari->matching;
             
-            //TODO: what is this???
-            if (par->minCount==1 && par->maxCount==1) { ///???
-                par->minCount = pari->minCount;
-                par->maxCount = pari->maxCount;
-            }
         }
     }
     else if (name!="?" && par->matching!=kMatchAhead) {
         errors++;
-        fprintf(stderr,"\n*** ParDef::bindName: '%s' not found\n",name.c_str());
+        fprintf(stderr,"\n*** ParPar::bindName: '%s' not found\n",name.c_str());
      }
 }
 
 /* promote only child
  */
-void ParDef::promoteOnlyChild(Par *par) {
+void ParPar::promoteOnlyChild(Par *par) {
     
     if (par->parList.size()==1) {
         
@@ -320,7 +322,7 @@ void ParDef::promoteOnlyChild(Par *par) {
     }
 }
 
-void ParDef::bindParTree(Par*par) {
+void ParPar::bindParTree(Par*par) {
     
     if (par->memoMe < Par::MemoNow) {
         par->memoMe = Par::MemoNow;
@@ -343,7 +345,7 @@ void ParDef::bindParTree(Par*par) {
     }
 }
 
-void ParDef::bindGrammar() {
+void ParPar::bindGrammar() {
     
     for (int i=0; i<grammar.size(); i++) {
         

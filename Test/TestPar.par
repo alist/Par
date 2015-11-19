@@ -1,0 +1,6 @@
+test (HEAD ~ PAR ~ IN ~ OUT ~ END?)+
+HEAD("[HEAD]")
+PAR ("[PAR]")
+IN  ("[IN]")
+OUT ("[OUT]")
+END ("[END]")
