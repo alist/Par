@@ -1,7 +1,6 @@
 /* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
 
 #import "ParPar.h"
-#import "ParParToks.h"
 #import "ParFile.h"
 
 #import "DebugPrint.h"
@@ -27,8 +26,7 @@ void ParPar::buf2Grammar(const char*buf, FILE*fp) {
     if (buf) {
         
         parToks = 0;
-        ParParToks *parParToks = new ParParToks();
-        Toks *toks = parParToks->buf2tok(buf,traceDoc,printToks,fp);
+        Toks *toks = parParToks.buf2tok(buf,traceDoc,printToks,fp);
         toks2Grammar(toks);
         bindGrammar();
     }
@@ -38,13 +36,13 @@ void ParPar::buf2Grammar(const char*buf, FILE*fp) {
     }
 }
 
-Toks *ParPar::parseFile(const char *filename, FILE *fp) {
+Toks *ParPar::file2Toks(const char *filename, FILE *fp) {
 
     Par::MemoNow++;
 
     char *buf = ParFile::readInputFile(filename);
     if (buf) {
-        Toks *toks = parseBuf(buf,fp);
+        Toks *toks = buf2Toks(buf,fp);
         free(buf);
         return toks;
     }
@@ -69,7 +67,7 @@ Toks *ParPar::parseBuf2File(const char *buf, const char *file) {
     printToks = true; // do show resulting tokens
 
     // parse the buffer
-    Toks * toks = parseBuf(buf,fp);
+    Toks * toks = buf2Toks(buf,fp);
     
     // pop trace/print state
     fflush(fp);
@@ -81,7 +79,7 @@ Toks *ParPar::parseBuf2File(const char *buf, const char *file) {
     return toks;
 }
 
-Toks *ParPar::parseBuf(const char *buf, FILE *fp) {
+Toks *ParPar::buf2Toks(const char *buf, FILE *fp) {
     
     // memoize the depth-first binding of symbol names
     Par::MemoNow++;

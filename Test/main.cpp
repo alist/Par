@@ -6,6 +6,6 @@
 int main(int argc, const char * argv[]) {
     
     ParTest::testOne("TestOne");
-    ParTest::testSuite("TestPar");
+    //    ParTest::testSuite("TestPar");
     return 0;
 }

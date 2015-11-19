@@ -99,22 +99,6 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Test/ParTest.cpp"
-            timestampString = "469583408.249565"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "75"
-            endingLineNumber = "75"
-            landmarkName = "ParTest::testSuite(const char*fname)"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "Par/ParFile.cpp"
             timestampString = "469588588.749878"
             startingColumnNumber = "9223372036854775807"
@@ -164,11 +148,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Par/ParPar.cpp"
-            timestampString = "469583408.249565"
+            timestampString = "469596084.60175"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "62"
-            endingLineNumber = "62"
+            startingLineNumber = "60"
+            endingLineNumber = "60"
             landmarkName = "ParPar::parseBuf2File(const char *buf, const char *file)"
             landmarkType = "5">
          </BreakpointContent>
@@ -180,44 +164,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Test/ParTest.cpp"
-            timestampString = "469583408.249565"
+            timestampString = "469598255.687799"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "72"
-            endingLineNumber = "72"
-            landmarkName = "ParTest::testSuite(const char*fname)"
+            startingLineNumber = "43"
+            endingLineNumber = "43"
+            landmarkName = "ParTest::testOne(const char*fname)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Par/ParToks.cpp"
-            timestampString = "469595282.172211"
+            timestampString = "469597680.017703"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "55"
             endingLineNumber = "55"
             landmarkName = "ParToks::buf2tok(const char *buf, bool trace, bool print, FILE *fp)"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Par/ParPar.cpp"
-            timestampString = "469592851.310626"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "32"
-            endingLineNumber = "32"
-            landmarkName = "ParPar::buf2Grammar(const char*buf, FILE*fp)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

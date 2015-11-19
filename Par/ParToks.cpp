@@ -50,7 +50,7 @@ Toks *ParToks::buf2tok(const char *buf, bool trace, bool print, FILE *fp) {
     Par::MemoNow++;
     Par::Trace=trace;
     
-    initNameHash(root);
+    ///??? initNameHash(root);
     
     ParDoc doc((char*)buf);
     root->parseStart(toks, doc);
@@ -60,7 +60,7 @@ Toks *ParToks::buf2tok(const char *buf, bool trace, bool print, FILE *fp) {
     return toks;
 }
 
-void ParToks::deleteToks() {
+ParToks::~ParToks() {
 
     if (toks) {
         

@@ -7,13 +7,11 @@ struct ParToks {
     
     Toks *toks;
     Par *root;
-
-    ParToks(Par*root_) {toks = new Toks(); root = root_;}
-    ParToks()          {toks = new Toks();}
     
-    ~ParToks(){deleteToks();}
+    ParToks()           { toks = new Toks(); }
+    ParToks(Par*root_)  { toks = new Toks(); root = root_;  initNameHash(root);}
+    ~ParToks();
     
-    void deleteToks();
     void printToks(FILE *fp);
     
     virtual void initNameHash(Par*);

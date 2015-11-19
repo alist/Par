@@ -2,6 +2,7 @@
 
 #import "Tok.h"
 #import "Par.h"
+#import "ParParToks.h"
 #import <string>
 #import <unordered_map>
 
@@ -13,6 +14,7 @@ struct ParToks;
  */
 struct ParPar {
     
+    ParParToks parParToks;
     NamePars namePars;  // namePars[*name] = par
     ParList grammar;    // list of Pars that refer to each other
     ParToks *parToks;   // invoke grammar on input buffer to produce steam of tokens
@@ -29,8 +31,8 @@ struct ParPar {
     void readGrammar(const char*filename, FILE *fp);
     void buf2Grammar(const char*buf, FILE *fp);
     
-    Toks *parseFile(const char* filename,FILE *fp);
-    Toks *parseBuf(const char* buf, FILE *fp);
+    Toks *file2Toks(const char* filename,FILE *fp);
+    Toks *buf2Toks(const char* buf, FILE *fp);
     Toks *parseBuf2File(const char* buf, const char *file);
     
     void toks2Grammar(Toks*toks);

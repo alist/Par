@@ -40,7 +40,7 @@ void ParTest::testOne(const char*fname) {
     parPar->printToks = true;
     parPar->readGrammar(parFile.c_str(),stderr);
     parPar->traceDoc = true;
-    parPar->parseFile(testFile.c_str(),stderr);
+    parPar->file2Toks(testFile.c_str(),stderr);
 }
 
 /* testSuite(fname) tests a series of definitions, inputs, and expected token outputs.
@@ -70,7 +70,7 @@ void ParTest::testSuite(const char*fname) {
 
     ParPar *parTest = new ParPar();
     parTest->readGrammar(parFile.c_str(),stderr);
-    parTest->parseFile(testFile.c_str(),stdout);
+    parTest->buf2Toks(testFile.c_str(),stdout);
     testTokens(parTest);
 }
 
