@@ -1,4 +1,4 @@
-/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+/* Copyright © 2015 Warren Stringer - MIT License - see file: License.mit */
 
 #import "ParFile.h"
 

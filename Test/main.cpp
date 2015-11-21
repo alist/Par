@@ -1,11 +1,16 @@
-/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+/* Copyright © 2015 Warren Stringer - MIT License - see file: License.mit */
 
 #include <stdio.h>
 #include "ParTest.h"
 
 int main(int argc, const char * argv[]) {
     
-    ParTest::testOne("TestOne");
-    //    ParTest::testSuite("TestPar");
+#if 0
+        
+        ParTest::helloWorld();
+#else
+        ParTest::testOne("TestOne");
+        ParTest::testSuite("TestSuite");
+#endif
     return 0;
 }

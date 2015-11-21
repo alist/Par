@@ -1,4 +1,4 @@
-/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+/* Copyright © 2015 Warren Stringer - MIT License - see file: License.mit */
 
 #import <vector>
 #import <stdlib.h>
@@ -37,9 +37,11 @@
  * Island parsing is not affected, because the unmatched portion of _chr
  * is copied to a newr "unmatched" token and then handled after tokenizing.
  */
-struct ParDoc {
+class ParDoc {
     
     char*_chr;
+    
+public:
     
     int idx;  // index of cursor after last match
     int size; // total size to beginning of terminating whitespace in _chr
@@ -117,7 +119,9 @@ struct ParDoc {
             _chr[endIdx] = hack;
         }
     }
-    
+    char *buf() {
+        return _chr;
+    }
     char *ptr() {
         return _chr+idx;
     }

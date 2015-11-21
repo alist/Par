@@ -1,12 +1,12 @@
-/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+/* Copyright © 2015 Warren Stringer - MIT License - see file: License.mit */
 
 #import "Par.h"
 
 /* Bootstrap the ParPar grammar for the parsing grammars
  *
  * TODO: this is the last vestige of the prior version of the Par app, which
- * would always create a .boot from each .par grammar file, which in turn was
- * included multiple times to contruct a static parser class. This meant
+ * would always create macro header from each .par grammar file, which in turn
+ * was included multiple times to contruct a static parser class. This meant
  * that a new binary was needed for any modifications to the grammar.
  *
  * Don't use ParBoot. Instead, use ParPar. With ParPar a modified grammar
@@ -61,4 +61,5 @@ struct _Regx : Par { InitRegx(_Regx,kMatchRegx) };
 #define Opt  new _Opt
 #define Quo  new _Quo
 #define Regx new _Regx
+
 

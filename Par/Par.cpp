@@ -1,4 +1,4 @@
-/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+/* Copyright © 2015 Warren Stringer - MIT License - see file: License.mit */
 
 #import "Par.h"
 #import "Tok.h"
@@ -11,8 +11,8 @@
 
 int  Par::MemoNow=0;            // current global memoize id - increase for every new document
 bool Par::Trace=false;          // show a sliding window of input doc while tokenizing
-int  Par::MaxCountDefault = 99; // max matches for a* or a+
-int  Par::MaxLevelDefault =200; // max levels deep into parse tree
+int  Par::MaxRepeatDefault = 99; // max matches for a* or a+
+int  Par::MaxLevelDefault = 200; // max levels deep into parse tree
 
 void Par::add(Par*n) {
     
@@ -22,8 +22,8 @@ void Par::add(Par*n) {
 void Par::init() {
     
     name = "?";
-    minCount = 1;
-    maxCount = 1;
+    minRepeat = 1;
+    maxRepeat = 1;
     matching = kMatchAnd;
     match.regx = 0;
     memoMe = -1;
@@ -40,10 +40,10 @@ void Par::init(RepeatType repeat_) {
     }
 }
 
-void Par::setMinMax(int minCount_, int maxCount_) {
+void Par::setMinMax(int minRepeat_, int maxRepeat_) {
     
-    minCount = minCount_;
-    maxCount = maxCount_>0 ? maxCount_ : MaxCountDefault;
+    minRepeat = minRepeat_;
+    maxRepeat = maxRepeat_>0 ? maxRepeat_ : MaxRepeatDefault;
 }
 void Par::init(MatchType matching_) {
     
@@ -73,12 +73,12 @@ void Par::setName(const char*name_) {
 Par& Par::operator =(Par&p_)  {
     
     //name     = p_.name; // do not copy name
-    minCount   = p_.minCount;
-    maxCount   = p_.maxCount;
-    parList    = p_.parList;
-    matching   = p_.matching;
-    match.regx = p_.match.regx;
-    match.quo  = p_.match.quo;
+    minRepeat   = p_.minRepeat;
+    maxRepeat   = p_.maxRepeat;
+    parList     = p_.parList;
+    matching    = p_.matching;
+    match.regx  = p_.match.regx;
+    match.quo   = p_.match.quo;
     return *this;
 }
 
@@ -123,46 +123,39 @@ inline void Par::printLevelInputMargin(int level, ParDoc&doc) {
 /* Par adds tokens to toks while matching and backtracks
  * to previous position in toks if the match fails
  */
-inline int Par::pushTok(Toks*toks, int level, ParDoc&doc) {
+inline int Par::pushTok(Toks&toks, int level, ParDoc&doc) {
     
-    int ret = (int)toks->size();
+    int ret = (int)toks.size();
     if (name.size()>0 && name[0]!='?') {
         
         Tok*token = new  Tok(name,0,level);
-        toks->push_back(token);
+        toks.push_back(token);
         
         printLevelInputMargin(level,doc);
         PrintParseTok("%s\n",name.c_str());
     }
     return ret;
 }
-
-inline void Par::popTok(Toks*toks, int priorToki) {
+/* match failed, so backtrack
+ */
+inline void Par::popTok(Toks&toks, int priorToki) {
     
-    while (toks->size()>priorToki) {
+    while (toks.size()>priorToki) {
         
-        Tok*token = toks->back();
+        Tok*token = toks.back();
         delete (token);
-        toks->pop_back();
+        toks.pop_back();
     }
 }
 
 #pragma mark - parse
 
-bool Par::parseStart(Toks*toks, ParDoc &doc) {
 
-    int level = 0;
-    Par *before = 0;
-    doc.eatWhitespace();
-    doc.trimTrailspace();
-    return parse(toks,doc,level,before);
-}
-
-inline bool Par::parse(Toks*toks, ParDoc &doc, int level, Par*&before) {
+bool Par::parse(Toks&toks, ParDoc &doc, int level, Par*&before) {
 
     int count = 0;
     
-    for (bool parsing=true; parsing && count<maxCount && doc.hasMore();) {
+    for (bool parsing=true; parsing && count<maxRepeat && doc.hasMore();) {
         
         switch (matching) {
                 
@@ -178,11 +171,11 @@ inline bool Par::parse(Toks*toks, ParDoc &doc, int level, Par*&before) {
             count++;
         }
     }
-    if (count==MaxCountDefault) {
-        PrintParseTok("\n*** %s:parseMany exceeded maximum count:%i",name.c_str(),MaxCountDefault);
+    if (count==MaxRepeatDefault) {
+        PrintParseTok("\n*** %s:parseMany exceeded maximum count:%i",name.c_str(),MaxRepeatDefault);
         exit(-1);
     }
-    return count>=minCount && count<=maxCount;
+    return count>=minRepeat && count<=maxRepeat;
  }
 
 #pragma mark - and or ahead wave
@@ -191,7 +184,7 @@ inline bool Par::parse(Toks*toks, ParDoc &doc, int level, Par*&before) {
  * The '~b' may refer to a corresponding statement 'b(...)'
  * or '~b' may be without a corresponding statement.
  */
-inline void Par::parseBefore(Toks *toks, ParDoc&doc, int level, Par *&before, int startIdx, int endIdx) {
+inline void Par::parseBefore(Toks&toks, ParDoc&doc, int level, Par *&before, int startIdx, int endIdx) {
     
     if (startIdx < endIdx) {
         
@@ -216,15 +209,15 @@ inline void Par::parseBefore(Toks *toks, ParDoc&doc, int level, Par *&before, in
         // for b without corresponding b(...)
         else {
             
-            Tok*unmatched = new Tok(before->name,doc._chr,startIdx,endIdx,level);
-            toks->push_back(unmatched);
+            Tok*unmatched = new Tok(before->name,doc.buf(),startIdx,endIdx,level);
+            toks.push_back(unmatched);
         }
     }
 }
 
 /* match a,c in (a c), (a ~b c), ...
  */
-inline bool Par::parseAhead(Toks *toks, ParDoc&doc, int level, Par *&before, Par*par) {
+inline bool Par::parseAhead(Toks&toks, ParDoc&doc, int level, Par *&before, Par*par) {
     
     // for b in '(a ~b c)'
     if (par->matching==kMatchAhead) {
@@ -238,7 +231,7 @@ inline bool Par::parseAhead(Toks *toks, ParDoc&doc, int level, Par *&before, Par
             PrintParseTok("%s: %s\n", before->name.c_str(),doc.ptr());
             
             Tok*token = new Tok(before->name,doc.ptr(),level);
-            toks->push_back(token);
+            toks.push_back(token);
             before = 0;
         }
     }
@@ -251,7 +244,7 @@ inline bool Par::parseAhead(Toks *toks, ParDoc&doc, int level, Par *&before, Par
     else {
         
         int startIdx = doc.idx;
-        size_t tokBefi = toks->size();
+        size_t tokBefi = toks.size();
         
         while (doc.hasMore()) {
         
@@ -259,20 +252,20 @@ inline bool Par::parseAhead(Toks *toks, ParDoc&doc, int level, Par *&before, Par
             
             // parse c (or c?)
             if (par->parse(toks, doc, level, before) &&
-                toks->size()>tokBefi) // did c? actually match something
+                toks.size()>tokBefi) // did c? actually match something
             {
                 
                 // detach new after tokens from toks
                 Toks after;
-                auto befi = std::next(toks->begin(), tokBefi);
-                after.insert(after.end(),befi, toks->end());
-                toks->resize(tokBefi);
+                auto befi = std::next(toks.begin(), tokBefi);
+                after.insert(after.end(),befi, toks.end());
+                toks.resize(tokBefi);
                 
                 // insert before tokens
                 parseBefore(toks, doc, level+1, before, startIdx, endIdx);
                 
                 // add back the new tokens
-                toks->insert(end(*toks), begin(after), end(after));
+                toks.insert(end(toks), begin(after), end(after));
                 before = 0;
                 return true;
             }
@@ -289,7 +282,7 @@ inline bool Par::parseAhead(Toks *toks, ParDoc&doc, int level, Par *&before, Par
 }
 /* match a,b,... in  (a b)
  */
-inline bool Par::parseAnd(Toks*toks, ParDoc &doc, int level, Par *&ignore) {
+inline bool Par::parseAnd(Toks&toks, ParDoc &doc, int level, Par *&ignore) {
     
     // push doc and toks
     ParDoc pushDoc(doc);
@@ -313,7 +306,7 @@ inline bool Par::parseAnd(Toks*toks, ParDoc &doc, int level, Par *&ignore) {
 
 /* match a, b, ... in (a | b)
  */
-inline bool Par::parseOr(Toks*toks, ParDoc &doc, int level, Par *&before) {
+inline bool Par::parseOr(Toks&toks, ParDoc &doc, int level, Par *&before) {
     
     // push doc and toks
     ParDoc pushDoc(doc);
@@ -338,6 +331,8 @@ inline bool Par::parseOr(Toks*toks, ParDoc &doc, int level, Par *&before) {
  * word-by-word until one of the patterns is matched and repeat.
  * Any unmatched portions between are put in a '~' token. 
  * If no matches, then the document backtracks to the beginning.
+ * This is somewhat similar to PCRE's "alternative" method:
+ * pcre_dfa_exec() //TODO: would it be faster to alternate with this?
  
  example: {
  
@@ -385,8 +380,8 @@ here is the word-by-word parse of the input stream
     ⦙c        ⦙ (a *b c d e)
     ⦙c        ⦙ (a b *c d e)         (~,"x"),(c,"c"),(~,"y z"),(b,"b")(c,"c")
 }
- */
-inline bool Par::parseWave(Toks*toks, ParDoc &doc, int level, Par *&ignore) {
+  */
+inline bool Par::parseWave(Toks&toks, ParDoc &doc, int level, Par *&ignore) {
     
     // push doc and toks
     ParDoc pushDoc(doc);
@@ -405,10 +400,10 @@ inline bool Par::parseWave(Toks*toks, ParDoc &doc, int level, Par *&ignore) {
         for (Par *par : parList) {
  
             endIdx = doc.idx;
-            size_t tokBefi = toks->size();
+            size_t tokBefi = toks.size();
 
             if (par->parse(toks, doc, level, before) &&
-                toks->size()>tokBefi) {
+                toks.size()>tokBefi) {
                 
                 count ++;
                 
@@ -417,9 +412,9 @@ inline bool Par::parseWave(Toks*toks, ParDoc &doc, int level, Par *&ignore) {
                 if (startIdx < endIdx) {
                     
                     endIdx = doc.trimSpace(endIdx);
-                    Tok*unmatched = new Tok(wave,doc._chr,startIdx,endIdx,level+1);
-                    auto befi = std::next(toks->begin(), tokBefi);
-                    toks->insert(befi, unmatched);
+                    Tok*unmatched = new Tok(wave,doc.buf(),startIdx,endIdx,level+1);
+                    auto befi = std::next(toks.begin(), tokBefi);
+                    toks.insert(befi, unmatched);
                 }
                 startIdx = doc.idx;
                 goto skip; // already advanced to enxt word
@@ -442,8 +437,8 @@ inline bool Par::parseWave(Toks*toks, ParDoc &doc, int level, Par *&ignore) {
             if (startIdx<endIdx) {
                 endIdx = doc.trimSpace(endIdx);
             }
-            Tok*unmatched = new Tok(wave,doc._chr, startIdx, endIdx, level+1);
-            toks->push_back(unmatched);
+            Tok*unmatched = new Tok(wave,doc.buf(), startIdx, endIdx, level+1);
+            toks.push_back(unmatched);
         }
     }
     return (count>0);
@@ -453,7 +448,7 @@ inline bool Par::parseWave(Toks*toks, ParDoc &doc, int level, Par *&ignore) {
 
 /* match literal a in ("a" b)
  */
-inline bool Par::parseQuo(Toks*toks, ParDoc &doc, int level) {
+inline bool Par::parseQuo(Toks&toks, ParDoc &doc, int level) {
     
     if (match.quo && match.quo->parse(doc)) {
         
@@ -467,15 +462,15 @@ inline bool Par::parseQuo(Toks*toks, ParDoc &doc, int level) {
 
 /* match regular expression a in ('^a' b)
  */
-inline bool Par::parseRegx(Toks*toks, ParDoc &doc, int level) {
+inline bool Par::parseRegx(Toks&toks, ParDoc &doc, int level) {
     
     if (match.regx && match.regx->parse(doc)) {
         
         // anonymous regx is named "?"
         
         if (name=="?") {
-            if (toks->size()) {
-                Tok*back = toks->back();
+            if (toks.size()) {
+                Tok*back = toks.back();
                 *back->value =  (match.regx->result2.size() > 0
                                  ? match.regx->result2 // use b in ('a'=>'b')
                                  : match.regx->result);
@@ -487,7 +482,7 @@ inline bool Par::parseRegx(Toks*toks, ParDoc &doc, int level) {
             PrintParseTok("%s: %s\n", name.c_str(),(const char*)*match.regx);
             
             Tok*token = new Tok(name,(const char*)*match.regx,level);
-            toks->push_back(token);
+            toks.push_back(token);
         }
         return true;
     }

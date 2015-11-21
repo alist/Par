@@ -1,4 +1,4 @@
-/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+/* Copyright © 2015 Warren Stringer - MIT License - see file: License.mit */
 
 #import "Tok.h"
 #define PrintParTok(...) DebugPrint(__VA_ARGS__)
@@ -30,4 +30,30 @@ inline void Tok::setTokType(string&name) {
         hashName[hash] = name;
         tokType = hash;
     }
+}
+
+
+/* print the token stream that resulted from
+ * applying a grammar to an input file
+ */
+void Tok::printToks(Toks &toks, FILE *fp) {
+    
+    fprintf(fp,"\n");
+    
+    int row=0;
+    for (Tok* tok : toks) {
+        
+        fprintf(fp,"%2i,%2i:",row++,tok->level);
+        
+        for (int col = 0; col<tok->level; col++) {
+            fprintf(fp," ");
+        }
+        
+        TokType type = tok->tokType;
+        const char* name = Tok::hashName[type].c_str();
+        const char* value = tok->value->c_str();
+        fprintf(fp,"%s : %s \n", name, value);
+    }
+    fprintf(fp,"\n");
+    
 }

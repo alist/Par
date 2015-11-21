@@ -1,50 +1,78 @@
-/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+/* Copyright © 2015 Warren Stringer - MIT License - see file: License.mit */
 
 #import "ParTest.h"
 #import "ParPar.h"
-#import "ParToks.h"
 #import "ParFile.h"
 
-/* test a single defintion, and input and then view the results on the console.
- * <fname>.par:     parser grammar
- * <fname>.test:    test file
- * for exampole
+ /* By popular demand ... hello world
+  * starting with two files HelloWold.par and .txt
  
- * TestOne.par:
+  * HelloWorld.par:
  
     def (hello|world)+ 
-    hello('hello') 
-    world('world')
+    hello('^hello')
+    world('^world')
  
- * TestOne.test:
+  * HelloWorld.txt:
  
     hello world
  
- * the console should show:
+  * the console should show:
  
     0, 1: def :
     1, 2:  hello : hello
     2, 1: def :
     3, 2:  world : world
+*/
 
- * to create a new test, use TestOne and copy and paste console results
- * into ParseTest.test, using the formate shown for testSuite, below
+void ParTest::helloWorld() {
+ 
+    ParPar *parPar = new ParPar();
+
+    parPar->parFile2Grammar("HelloWorld.par",stderr);
+    parPar->txtFile2Tokens ("HelloWorld.txt",stderr,/*trace*/true);
+    Tok::printToks(parPar->toks, stderr);
+}
+
+/* Test a single defintion, and input and then view the results on the console.
+ * <fname>.par:    parser grammar
+ * <fname>.txt:    text file
+ * To create a new test, use TestOne and copy and paste console results
+ * into ParseTest.txt, using the formate shown for testSuite, below
+ *
+ * If there are any problems with the tokenizing, can trace what 
+ * the doc is point at by setting: txtFile2Tokens(...,...,true)
+ * resulting in the an output that looks like this:
+
+    ⦙a b c d  ⦙   1: def
+    ⦙b c d    ⦙   2:  a: a
+    ⦙d        ⦙   2:  c: c
+ 
+ * To show the resulting token invoke: Tok::printToks(...)
+ * which whill print out a token stream id,level: name: value
+ 
+    0, 1: def :
+    1, 2:  a : a
+    2, 2:  ~ : b
+    3, 2:  c : c
+    4, 2:  ~ : d
  */
  
 void ParTest::testOne(const char*fname) {
 
     string parFile  = fname; parFile  += ".par";
-    string testFile = fname; testFile += ".test";
+    string testFile = fname; testFile += ".txt";
     
     ParPar *parPar = new ParPar();
-    parPar->printToks = true;
-    parPar->readGrammar(parFile.c_str(),stderr);
-    parPar->traceDoc = true;
-    parPar->file2Toks(testFile.c_str(),stderr);
+    parPar->parFile2Grammar(parFile.c_str(),stderr);
+    Tok::printToks(parPar->toks, stderr);
+
+    parPar->txtFile2Tokens(testFile.c_str(),stderr,/*trace*/true);
+    Tok::printToks(parPar->toks, stderr);
 }
 
-/* testSuite(fname) tests a series of definitions, inputs, and expected token outputs.
- * <fname>.par:  defines a test suite parser: test (HEAD ~ PAR ~ IN ~ OUT ~ END?)+
+/* testSuite(fname) tests a series of grammars, inputs, and token outputs.
+ * <fname>.par:  defines the grammar: test (HEAD ~ PAR ~ IN ~ OUT ~ END?)+
  * <fname>.test: provides as series of tests.
  * For example, for ParTest.test:
 
@@ -59,19 +87,18 @@ void ParTest::testOne(const char*fname) {
     ...
     [END]
  
- * TestSuite is somewhat circular, in that is is using Par to test Par.
- * ParTest.par is a valid Par file 
- 
+ * testSuite is somewhat circular, in that is is using Par to test Par.
+ * ParTest.par is a valid Par file
  */
 void ParTest::testSuite(const char*fname) {
     
     string parFile  = fname; parFile  += ".par";
     string testFile = fname; testFile += ".test";
 
-    ParPar *parTest = new ParPar();
-    parTest->readGrammar(parFile.c_str(),stderr);
-    parTest->buf2Toks(testFile.c_str(),stdout);
-    testTokens(parTest);
+    ParPar *parSuite = new ParPar();
+    parSuite->parFile2Grammar(parFile.c_str(),stderr);
+    parSuite->txtFile2Tokens(testFile.c_str(),stderr);
+    testTokens(parSuite);
 }
 
 /* Called by testSuite to test a series of alternating
@@ -91,17 +118,16 @@ void ParTest::testSuite(const char*fname) {
     END : 0 error in 21 tests
  *
 */
-void ParTest::testTokens(ParPar *parTest) {
+void ParTest::testTokens(ParPar *parSuite) {
     
-    ParPar *parPar = 0;
-    Toks*toks = parTest->parToks->toks;
+    ParPar *parTest = 0;
     
     typedef enum { kUndef, kHead, kPar, kIn, kOut} Context;
     Context context = kUndef;
     int errors = 0;
     int tests = 0;
     
-    for (Tok*tok : *toks) {
+    for (Tok*tok : parSuite->toks) {
         
         switch (tok->tokType) {
                 
@@ -132,32 +158,32 @@ void ParTest::testTokens(ParPar *parTest) {
                         fprintf(stderr,"\nTEST: %s ",singleLine);
                         break;
                         
-                    case kPar:
+                    case kPar: {
                         
-                        //fprintf(stderr,"PAR : %s\n",singleLine);
-                        if (parPar) {
-                            delete (parPar);
+                         if (parTest) {
+                            delete (parTest);
                         }
-                        parPar = new ParPar();
-                        parPar->buf2Grammar(tok->value->c_str(),stdout);
+                        parTest = new ParPar();
+                        const char *parBuf = tok->value->c_str();
+                        parTest->parBuf2Grammar(parBuf,stdout);
                         break;
+                    }
+                    case kIn: {
                         
-                    case kIn:
-                        
-                        //fprintf(stderr,"IN  : %s\n",singleLine);
-                        parPar->parseBuf2File(tok->value->c_str(),"results");
+                        const char *inputBuf = tok->value->c_str();
+                         parTest->txtBuf2TokFile(inputBuf,"results");
                         break;
+                    }
+                    case kOut: {
                         
-                    case kOut:
-                        
-                        //fprintf(stderr,"OUT : %s\n",singleLine);
-                        if (!ParFile::compareBufToFile(tok->value->c_str(),"results")) {
+                        const char *expectedBuf = tok->value->c_str();
+                        if (!ParFile::compareBufToFile(expectedBuf,"results")) {
                             errors++;
                         }
                         tests++;
 
                         break;
-                        
+                    }
                 }
             }
         }

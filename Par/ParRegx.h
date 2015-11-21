@@ -1,4 +1,4 @@
-/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+/* Copyright © 2015 Warren Stringer - MIT License - see file: License.mit */
 
 #import <locale.h>
 #import <stdlib.h> 
@@ -163,9 +163,5 @@ struct ParRegx  {
         }
         return false;
     }    
-    
-    void eval() {}
-    ///operator int() { return (int)atoi(result.c_str()); }
-    operator float() { return (float)atof(result.c_str()); }    
     operator const char *() { return result.c_str(); }
 };

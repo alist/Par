@@ -1,120 +1,86 @@
-/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+
+/* Copyright © 2015 Warren Stringer - MIT License - see file: License.mit */
 
 #import "ParPar.h"
 #import "ParFile.h"
+#include <assert.h>
+#import "Tok.h"
 
-#import "DebugPrint.h"
-#define PrintParDef(...) DebugPrint(__VA_ARGS__)
+ParBoot ParPar::_ParBoot;
 
-void ParPar::readGrammar(const char*filename, FILE *fp) {
+void ParPar::parFile2Grammar(const char*fname, FILE *fp) {
     
     Par::MemoNow++;
     
-    const char *buf = ParFile::readInputFile(filename);
+    const char *buf = ParFile::readInputFile(fname);
     if (buf) {
-        buf2Grammar(buf,fp);
+        parBuf2Grammar(buf,fp);
         delete (buf);
     }
     else {
-        fprintf(stderr,"\n*** ParPar::initWithFile(%s) - file not found\n", filename);
+        fprintf(stderr,"\n*** ParPar::initWithFile(%s) - file not found\n", fname);
         errors++;
     }
 }
 
-void ParPar::buf2Grammar(const char*buf, FILE*fp) {
-
-    if (buf) {
-        
-        parToks = 0;
-        Toks *toks = parParToks.buf2tok(buf,traceDoc,printToks,fp);
-        toks2Grammar(toks);
-        bindGrammar();
-    }
-    else {
-         fprintf(stderr,"\n*** ParPar::initWithBuf - null buffer\n");
-        errors++;
-    }
-}
-
-Toks *ParPar::file2Toks(const char *filename, FILE *fp) {
-
-    Par::MemoNow++;
-
-    char *buf = ParFile::readInputFile(filename);
-    if (buf) {
-        Toks *toks = buf2Toks(buf,fp);
-        free(buf);
-        return toks;
-    }
-    else {
-        fprintf(stderr,"\n*** ParPar::parseFile(%s) - file not found\n", filename);
-        errors++;
-        return 0;
-    }
-}
-
-/*
+/* convert a char buffer in the format: "a (b c)\nb ('b')\nc ('c')"
+ * into a token stream, which in turn gets parsed into a grammar
  */
-Toks *ParPar::parseBuf2File(const char *buf, const char *file) {
+void ParPar::parBuf2Grammar(const char*buf, FILE*fp) {
     
-    // redirect trace stdout to file
-    FILE *fp = freopen(file, "w", stdout);
-
-    // push trace/print state
-    bool pushTraceBuf = traceDoc;
-    bool pushPrintToks = printToks;
-    traceDoc = false; // don't show detail of tokenizing
-    printToks = true; // do show resulting tokens
-
-    // parse the buffer
-    Toks * toks = buf2Toks(buf,fp);
-    
-    // pop trace/print state
-    fflush(fp);
-    fclose(fp);
-
-    traceDoc = pushTraceBuf;
-    printToks = pushPrintToks;
-    
-    return toks;
-}
-
-Toks *ParPar::buf2Toks(const char *buf, FILE *fp) {
-    
-    // memoize the depth-first binding of symbol names
-    Par::MemoNow++;
-
-    if (grammar.size()>0) {
+    if (buf) {
         
-        parToks = new ParToks(grammar[0]);
-        parToks->buf2tok(buf,traceDoc,printToks,fp);
+        grammar.clear();
+        _bufGram2toks(buf,_ParBoot.grammar,fp);
+        _toks2Grammar();
+        _bindGrammar();
+        _hashGrammar(grammar[0]);
+        toks.clear();
     }
     else {
-        DebugPrint("\n*** ParPar::parseBuf has no tokens\n");
-        return 0;
+        fprintf(stderr,"\n*** ParPar::initWithBuf - null buffer\n");
+        errors++;
     }
-    return parToks->toks;
 }
 
+/* create a token stream by applying parGram to buf
+ */
+void ParPar::_bufGram2toks(const char *buf, ParList &gram, FILE *fp) {
+    
+    Par::MemoNow++;
+    
+    /* ParDoc shares buf with many instances of itself
+     * to allow for backtracking while parsing a pattern tree */
+    ParDoc doc((char*)buf);
+    doc.eatWhitespace();
+    doc.trimTrailspace();
+    
+    toks.clear();
+    int level = 0;
+    Par *before = 0;
+    Par *root = gram.front();
+    root->parse(toks,doc,level,before);
+ }
 /* parse  a (b c?)+
- * Read the grammar, line by line, in the format of: a (b c)
+ * convert the token stream into a gramar
+ * starting with an input file in the format of: a (b c
  * where a is the value of "par" and b c are the values of "list"
  */
-void ParPar::toks2Grammar(Toks*toks) {
+void ParPar::_toks2Grammar() {
     
     Par *par = 0;
     
-    for (int toki=0; toki<toks->size();) {
+    for (int toki=0; toki < toks.size();) {
         
-        Tok *tok = (*toks)[toki];
+        Tok *tok = toks[toki];
         
         switch (tok->tokType) {
                 
             case str2int("par"): {
                 
-                if (++toki < toks->size()) {
+                if (++toki < toks.size()) {
                     
-                    tok = (*toks)[toki];
+                    tok = toks[toki];
                     string *name = tok->value;
                     par = new Par(name);
                     namePars[*name] = par;
@@ -124,7 +90,7 @@ void ParPar::toks2Grammar(Toks*toks) {
             }
             case str2int("list"): {
                 
-                toki = addList(par,toks,toki);
+                toki = _addList(par,toki);
                 break;
             }
             default: {
@@ -135,17 +101,18 @@ void ParPar::toks2Grammar(Toks*toks) {
         }
     }
 }
-
-int ParPar::addList(Par*par,Toks*toks,int toki) {
+/* apply _BootGram grammar to new <file>.par
+ */
+int ParPar::_addList(Par*par,int toki) {
     
-    Tok *tok = (*toks)[toki];
+    Tok *tok = toks[toki];
     int level = tok->level;
     
-    while (toki+1<toks->size() &&
-           (*toks)[toki+1]->level>level) {
+    while (toki+1<toks.size() &&
+           toks[toki+1]->level>level) {
         
         toki++;
-        tok = (*toks)[toki];
+        tok = toks[toki];
         
         switch (tok->tokType) {
                 
@@ -158,7 +125,7 @@ int ParPar::addList(Par*par,Toks*toks,int toki) {
                 
                 Par *pari = new Par(kMatchWave);
                 par->parList.push_back(pari);
-                toki = addList(pari, toks, toki);
+                toki = _addList(pari, toki);
                 break;
             }
                 
@@ -166,17 +133,17 @@ int ParPar::addList(Par*par,Toks*toks,int toki) {
                 
                 Par *pari = new Par(kMatchAnd);
                 par->parList.push_back(pari);
-                toki = addList(pari, toks, toki);
+                toki = _addList(pari, toki);
                 break;
             }
-
+                
             case str2int("ors"): {
                 
                 Par *pari = new Par(kMatchOr);
                 par->parList.push_back(pari);
-                toki = addList(pari, toks, toki);
+                toki = _addList(pari, toki);
                 break;
-            } 
+            }
                 
             case str2int("name"): {
                 
@@ -218,7 +185,7 @@ int ParPar::addList(Par*par,Toks*toks,int toki) {
                 Par *pari = new Par(kMatchAhead);
                 pari->name = *tok->value;
                 par->parList.push_back(pari);
-                toki = addList(pari, toks, toki);
+                toki = _addList(pari, toki);
                 break;
             }
             case str2int("exact"): {
@@ -239,7 +206,7 @@ int ParPar::addList(Par*par,Toks*toks,int toki) {
                 
                 int num = atoi(tok->value->c_str());
                 Par *pari = par->parList.back();
-                pari->maxCount = num;
+                pari->maxRepeat = num;
                 break;
             }
             case str2int("opt"): {
@@ -265,12 +232,102 @@ int ParPar::addList(Par*par,Toks*toks,int toki) {
     return toki;
 }
 
-/* find named par and get its parList
+/* Use by test suites to save a token stream to a file
+ * and the subsequently compare the results.
  */
-inline void ParPar::bindName(Par*par) {
+void ParPar::txtBuf2TokFile(const char *buf, const char *file) {
+    
+    // redirect trace stdout to file
+    FILE *fp = freopen(file, "w", stdout);
+
+    // parse the buffer
+    txtBuf2Tokens(buf,fp);
+    
+    Tok::printToks(toks, fp);
+    
+    fflush(fp);
+    fclose(fp);
+}
+
+/* Initialize name hash, which is used for "case str2int("name"): statements.
+ * starting from root node (usually a "def(...)", parse the graph depth first
+ * and add name and its hash to two unordered_maps.
+ * Memoize to eliminate reprocessing cyclic loops
+ */
+void ParPar::_hashGrammar(Par *par) {
+    
+    // only pass through once - break cycles
+    if (par->memoMe < Par::MemoNow) {
+        par->memoMe = Par::MemoNow;
+        
+        /* each unique name will have only one hash
+         * regardless of which grammar it is coming from
+         * so this ordered_map can be shared globally
+         */
+        
+        int64_t hash = str2int(par->name.c_str());
+        
+        if (Tok::hashName.find(hash)==Tok::hashName.end()) {
+            
+            Tok::nameHash[par->name] = hash;
+            Tok::hashName[hash] = par->name;
+        }
+        else {
+            // Failing this assert means a collision was detected
+            // To fix, redesign str2int -- can't fix this during runtime
+            assert(Tok::hashName[hash] == par->name);
+        }
+        for (Par*par2 :par->parList) {
+            _hashGrammar(par2);
+        }
+    }
+}
+
+/* grammar is ready, convert text buffer into toks
+ */
+void ParPar::txtBuf2Tokens(const char *buf, FILE *fp) {
+    
+    // memoize the depth-first binding of symbol names
+    Par::MemoNow++;
+
+    if (grammar.size()>0) {
+        
+        _bufGram2toks(buf,grammar,fp);
+    }
+    else {
+        fprintf(stderr,"\n*** ParPar::parseBuf has no tokens\n");
+    }
+}
+
+/* grammar is ready, read a text file into buf and call txtBuf2Tokens
+ */
+void ParPar::txtFile2Tokens(const char *fname, FILE *fp, bool trace) {
+    
+    Par::MemoNow++;
+    Par::Trace = trace;
+    
+    char *buf = ParFile::readInputFile(fname);
+    if (buf) {
+        txtBuf2Tokens(buf,fp);
+        free(buf);
+    }
+    else {
+        fprintf(stderr,"\n*** ParPar::parseFile(%s) - file not found\n", fname);
+        errors++;
+    }
+    Par::Trace = false;
+}
+
+
+/* find named par and hoist its parList to be my parList
+ * but keep my repetition spec
+ */
+inline void ParPar::_bindName(Par*par) {
     
     string &name = par->name;
     Par *pari = namePars[name];
+    
+    // b in (a ~b c)
     if (!pari && name[0]=='~') {
     
         pari = namePars[name.substr(1)];
@@ -281,7 +338,7 @@ inline void ParPar::bindName(Par*par) {
         if (par->matching == kMatchAhead) {
             
             Par *par2 = new Par(&name);
-            bindName(par2);
+            _bindName(par2);
             par->parList.push_back(par2);
         }
         else if (pari!=par) {
@@ -289,18 +346,18 @@ inline void ParPar::bindName(Par*par) {
             par->parList  = pari->parList;     // replace with children with lvalue's children
             par->match    = pari->match;
             par->matching = pari->matching;
-            
         }
     }
     else if (name!="?" && par->matching!=kMatchAhead) {
         errors++;
-        fprintf(stderr,"\n*** ParPar::bindName: '%s' not found\n",name.c_str());
+        fprintf(stderr,"\n*** ParPar::_bindName: '%s' not found\n",name.c_str());
      }
 }
 
-/* promote only child
+/* Some Pars have a single child after ? ,
+ * so promote the child to take the Par's place
  */
-void ParPar::promoteOnlyChild(Par *par) {
+void ParPar::_promoteOnlyChild(Par *par) {
     
     if (par->parList.size()==1) {
         
@@ -308,10 +365,12 @@ void ParPar::promoteOnlyChild(Par *par) {
         
         if (par2->name=="?") {
             
-            //TODO: what is this???
-            if (par->minCount==1 && par->maxCount==1) { ///???
-                par->minCount = par2->minCount;
-                par->maxCount = par2->maxCount;
+            /* the default Par is a single instance (min|max)Count==1 
+             * so overide with the child's repetition
+             */
+            if (par->minRepeat==1 && par->maxRepeat==1) {
+                par->minRepeat = par2->minRepeat;
+                par->maxRepeat = par2->maxRepeat;
             }
             par->matching = par2->matching;
             par->match    = par2->match;
@@ -319,14 +378,16 @@ void ParPar::promoteOnlyChild(Par *par) {
         }
     }
 }
-
-void ParPar::bindParTree(Par*par) {
+/* lookup each name in a par->parList 
+ * to bind to the actual par of that name (lvalue)
+ */
+void ParPar::_bindGrammarTree(Par*par) {
     
     if (par->memoMe < Par::MemoNow) {
         par->memoMe = Par::MemoNow;
         
-        promoteOnlyChild(par);
-        bindName(par);
+        _promoteOnlyChild(par);
+        _bindName(par);
         
         if (errors>0) {
             fprintf(stderr, "\n*** Exiting Par due to %i error%s \n\n",errors,errors>1 ? "s." : ".");
@@ -337,22 +398,22 @@ void ParPar::bindParTree(Par*par) {
             
             for (Par*par2 : par->parList) {
                 
-                bindParTree(par2);
+                _bindGrammarTree(par2);
             }
         }
     }
 }
 
-void ParPar::bindGrammar() {
+void ParPar::_bindGrammar() {
     
     for (int i=0; i<grammar.size(); i++) {
         
         Par*par = grammar[i];
-        promoteOnlyChild(par);
+        _promoteOnlyChild(par);
     }
     Par::MemoNow++;
     for (Par*par : grammar) {
         
-        bindParTree(par);
+        _bindGrammarTree(par);
     }
 }

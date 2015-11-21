@@ -1,4 +1,4 @@
-/* Copyright © 2015 Warren Stringer - MIT License - see file: license.mit */
+/* Copyright © 2015 Warren Stringer - MIT License - see file: License.mit */
 
 #import <locale.h>
 #import <stdlib.h> 
@@ -35,8 +35,5 @@ struct ParQuo {
         return false;
     }    
     
-    void eval() {}
-    operator int() { return (int)atoi(pattern); }    
-    operator float() { return (float)atof(pattern); }    
     operator const char *() { return pattern;}
 };
